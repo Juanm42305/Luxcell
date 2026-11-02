@@ -3,6 +3,12 @@ export const defaultLogo = { src: "/brand/luxcell-logo.webp", width: 362, height
 
 export const fallbackBusinessName = "LUX CELL";
 
+/**
+ * Video de fondo del banner principal, servido desde public/video. En null se muestra la
+ * ilustración. Solo usar videos propios o con licencia de uso comercial.
+ */
+export const heroVideo: { src: string; poster: string } | null = null;
+
 export const siteDescription =
   "Celulares, accesorios y tecnología en LUX CELL. Consulta disponibilidad y escríbenos por WhatsApp.";
 
