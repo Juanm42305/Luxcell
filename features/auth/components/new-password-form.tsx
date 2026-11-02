@@ -7,7 +7,7 @@ import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { newPasswordSchema } from "@/schemas/auth";
 import { authFieldClass, FormError } from "./auth-card";
 
-export function NewPasswordForm() {
+export function NewPasswordForm({ adminBase }: { adminBase: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -17,10 +17,10 @@ export function NewPasswordForm() {
       .auth.mfa.getAuthenticatorAssuranceLevel()
       .then(({ data }) => {
         if (data?.nextLevel === "aal2" && data.currentLevel !== "aal2") {
-          router.replace("/admin/mfa?siguiente=contrasena");
+          router.replace(`${adminBase}/mfa?siguiente=contrasena`);
         }
       });
-  }, [router]);
+  }, [adminBase, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,7 +40,7 @@ export function NewPasswordForm() {
       return;
     }
 
-    router.replace("/admin");
+    router.replace(adminBase);
   }
 
   return (

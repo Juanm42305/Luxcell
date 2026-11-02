@@ -32,6 +32,12 @@ rotarla, porque borrarla del repositorio no basta.
   solo `https` y colores validados.
 - **Encabezados:** CSP con nonce por respuesta y `strict-dynamic`, HSTS, `nosniff`,
   `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`.
+- **Panel:** vive en una dirección secreta (`ADMIN_ACCESS_PATH`, solo servidor) y `/admin`
+  responde 404. Cada acción del servidor valida con Zod y vuelve a exigir administrador con MFA
+  antes de tocar datos; la base lo verifica otra vez con RLS.
+- **Fotos:** el navegador sube el original a un bucket privado de cuarentena con nombre aleatorio.
+  El servidor comprueba la firma real del archivo, que se pueda decodificar y sus dimensiones, y
+  publica un WebP nuevo sin metadatos (GPS, EXIF). El original se borra siempre.
 - **Errores:** los registros guardan solo códigos y el visitante ve un mensaje genérico.
 - **Cadena de suministro:** acciones de CI fijadas por SHA, Dependabot y `npm audit`.
 
@@ -46,11 +52,13 @@ Ataques de punta a punta contra el entorno local (nunca contra producción). Def
 con `PUBLISHABLE_KEY` y `SECRET_KEY` de `npx supabase status`, con la app en el puerto 3000:
 
 ```bash
-node tests/e2e/security-attacks.mjs
+node tests/e2e/security-attacks.mjs   # también requiere ADMIN_ACCESS_PATH
+node tests/e2e/admin-panel.mjs
 ```
 
 Cubre lectura y escritura directa a la API, escalada a administrador, enlace de recuperación robado,
-usuario sin perfil de administrador, inyección y XSS en filtros, encabezados y violaciones de CSP.
+usuario sin perfil de administrador, ocultamiento del panel, inyección y XSS en filtros y en nombres
+de producto, archivos falsos y políglotas, eliminación de EXIF, encabezados y violaciones de CSP.
 
 ## Riesgos residuales
 

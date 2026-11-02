@@ -47,16 +47,28 @@ Flujo: GitHub → CI → Vercel. Cada rama genera una vista previa y `main` publ
    select id from auth.users where email = 'correo-del-administrador';
    ```
 
-3. Entrar a `/admin/login` y configurar el autenticador. Sin este paso no hay acceso al panel.
+3. Entrar a `https://<dominio>/<ADMIN_ACCESS_PATH>/login` y configurar el autenticador. Sin este
+   paso no hay acceso al panel.
 
 ## 4. Vercel
 
 1. Importar el repositorio de GitHub.
-2. Agregar solo estas dos variables:
+2. Agregar estas variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `ADMIN_ACCESS_PATH`: dirección secreta del panel, 16 a 64 caracteres (letras, números, `-`,
+     `_`). **Sin prefijo `NEXT_PUBLIC_`**: así nunca llega al navegador de los visitantes. Sin
+     este valor el panel queda desactivado. Para generar uno en PowerShell:
+
+     ```powershell
+     $b = New-Object byte[] 12; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); "panel-" + (($b | ForEach-Object { $_.ToString("x2") }) -join "")
+     ```
 
    **No agregar la clave `secret` ni la contraseña de la base de datos.**
+
+   La dirección del panel no es una contraseña: oculta el panel de los robots que buscan `/admin`,
+   pero la protección real son la contraseña, el segundo factor y las políticas RLS. Si se filtra,
+   cámbiala en Vercel y vuelve a desplegar.
 
 3. Las vistas previas usan esta misma base de datos si comparten variables. Mientras no exista un
    proyecto de pruebas, no usar datos personales reales.
@@ -64,5 +76,5 @@ Flujo: GitHub → CI → Vercel. Cada rama genera una vista previa y `main` publ
 ## Verificación tras cada despliegue
 
 - `https://securityheaders.com` sobre el dominio.
-- `/admin` sin sesión redirige a `/admin/login`.
+- `/admin` responde 404 y `/<ADMIN_ACCESS_PATH>` sin sesión redirige a su `/login`.
 - La consulta directa a la tabla `inquiries` con la clave pública devuelve 401.

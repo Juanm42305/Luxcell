@@ -5,6 +5,9 @@ import crypto from "node:crypto";
 
 const app = "http://localhost:3000";
 const api = "http://127.0.0.1:54321";
+// Dirección secreta del panel: la misma ADMIN_ACCESS_PATH de .env.local.
+const ADMIN = "/" + process.env.ADMIN_ACCESS_PATH;
+if (ADMIN === "/undefined") throw new Error("Define ADMIN_ACCESS_PATH");
 const pub = process.env.PUB;
 const secret = process.env.SEC;
 let failures = 0;
@@ -153,14 +156,39 @@ check(
   "el nonce cambia en cada respuesta",
   r2.headers.get("content-security-policy").match(/nonce-([^']+)/)[1] !== nonce1,
 );
-for (const p of ["/admin", "/admin/productos", "/admin/mfa", "/admin/nueva-contrasena"]) {
+for (const p of [
+  "/admin",
+  "/admin/login",
+  "/admin/productos",
+  "/admin/mfa",
+  "/administrador",
+  "/panel",
+]) {
   const a = await fetch(app + p, { redirect: "manual" });
+  check(`${p} no existe (404, sin pistas del panel)`, a.status === 404, `HTTP ${a.status}`);
+}
+for (const p of [
+  "",
+  "/productos",
+  "/productos/nuevo",
+  "/configuracion",
+  "/mfa",
+  "/nueva-contrasena",
+]) {
+  const a = await fetch(app + ADMIN + p, { redirect: "manual" });
   check(
-    `${p} sin sesión redirige al login`,
-    a.status === 307 && a.headers.get("location").endsWith("/admin/login"),
+    `ruta secreta${p || " (resumen)"} sin sesión redirige al login`,
+    a.status === 307 && a.headers.get("location").endsWith(ADMIN + "/login"),
     `${a.status}`,
   );
 }
+const panelLogin = await fetch(app + ADMIN + "/login");
+check(
+  "la ruta secreta lleva noindex",
+  (panelLogin.headers.get("x-robots-tag") ?? "").includes("noindex"),
+);
+const home = await (await fetch(app + "/")).text();
+check("la página pública no revela la ruta secreta", !home.includes(process.env.ADMIN_ACCESS_PATH));
 r = await fetch(app + "/catalogo?q=" + encodeURIComponent("' OR 1=1;--") + "&min=abc&orden=DROP");
 check(
   "inyección en filtros no rompe ni filtra",
@@ -176,7 +204,7 @@ r = await fetch(app + "/auth/callback?code=falso&next=https://malo.example", {
 });
 check(
   "callback no redirige a sitios externos",
-  (r.headers.get("location") ?? "").startsWith(app + "/admin/login"),
+  (r.headers.get("location") ?? "").startsWith(app + ADMIN + "/login"),
   r.headers.get("location"),
 );
 r = await fetch(app + "/producto/" + encodeURIComponent("' OR 1=1--"));
@@ -221,7 +249,7 @@ page.on("console", (m) => {
 });
 page.on("pageerror", (e) => console.log("[pageerror]", e.message));
 
-await page.goto(app + "/admin/login");
+await page.goto(app + ADMIN + "/login");
 await page.fill("#email", adminEmail);
 await page.fill("#password", randomPassword());
 await page.click("button[type=submit]");
@@ -233,10 +261,10 @@ check(
 
 await page.fill("#password", password);
 await page.click("button[type=submit]");
-await page.waitForURL("**/admin/mfa");
-check("tras la contraseña pide segundo factor", page.url().endsWith("/admin/mfa"));
-await page.goto(app + "/admin");
-check("sin MFA no entra al panel", page.url().endsWith("/admin/mfa"), page.url());
+await page.waitForURL("**" + ADMIN + "/mfa");
+check("tras la contraseña pide segundo factor", page.url().endsWith(ADMIN + "/mfa"));
+await page.goto(app + ADMIN);
+check("sin MFA no entra al panel", page.url().endsWith(ADMIN + "/mfa"), page.url());
 await page.getByRole("button", { name: "Configurar autenticador" }).click();
 await page.waitForSelector("code");
 const qrOk = await page
@@ -250,11 +278,11 @@ await page.waitForSelector("p[role=alert]");
 check(
   "código TOTP errado rechazado",
   (await page.textContent("p[role=alert]")).includes("Código incorrecto") &&
-    page.url().endsWith("/admin/mfa"),
+    page.url().endsWith(ADMIN + "/mfa"),
 );
 await page.fill("#code", totp(totpSecret));
 await page.click("button[type=submit]");
-await page.waitForURL((u) => u.pathname === "/admin", { timeout: 15000 });
+await page.waitForURL((u) => u.pathname === ADMIN, { timeout: 15000 });
 await page.waitForSelector("h1");
 check("con MFA entra al panel", (await page.textContent("h1")) === "Resumen");
 const stats = await page.locator("dd").allTextContents();
@@ -265,10 +293,10 @@ const sessionCookie = cookies.find((c) => c.name.includes("auth-token"));
 check("cookie de sesión SameSite=Lax", sessionCookie?.sameSite === "Lax");
 
 await page.getByRole("button", { name: "Cerrar sesión" }).click();
-await page.waitForURL("**/admin/login");
-check("cerrar sesión funciona", page.url().endsWith("/admin/login"));
-await page.goto(app + "/admin");
-check("tras cerrar sesión no hay acceso", page.url().endsWith("/admin/login"), page.url());
+await page.waitForURL("**" + ADMIN + "/login");
+check("cerrar sesión funciona", page.url().endsWith(ADMIN + "/login"));
+await page.goto(app + ADMIN);
+check("tras cerrar sesión no hay acceso", page.url().endsWith(ADMIN + "/login"), page.url());
 
 // Segundo ingreso: con factor ya registrado debe pedir solo el código
 await page.fill("#email", adminEmail);
@@ -283,20 +311,20 @@ check(
 // Un usuario válido pero no administrador, incluso con MFA, no entra
 const ctx2 = await browser.newContext();
 const p2 = await ctx2.newPage();
-await p2.goto(app + "/admin/login");
+await p2.goto(app + ADMIN + "/login");
 await p2.fill("#email", plainUser.email);
 await p2.fill("#password", password);
 await p2.click("button[type=submit]");
-await p2.waitForURL("**/admin/mfa");
+await p2.waitForURL("**" + ADMIN + "/mfa");
 await p2.getByRole("button", { name: "Configurar autenticador" }).click();
 await p2.waitForSelector("code");
 const s2 = await p2.textContent("code");
 await p2.fill("#code", totp(s2));
 await p2.click("button[type=submit]");
-await p2.waitForURL((u) => u.pathname === "/admin/login", { timeout: 15000 });
+await p2.waitForURL((u) => u.pathname === ADMIN + "/login", { timeout: 15000 });
 check(
   "usuario sin perfil de admin no entra, aun con MFA",
-  p2.url().endsWith("/admin/login"),
+  p2.url().endsWith(ADMIN + "/login"),
   p2.url(),
 );
 
@@ -355,7 +383,7 @@ check(
 await new Promise((res) => setTimeout(res, 62000)); // respeta max_frequency = 60s
 const ctx3 = await browser.newContext();
 const p3 = await ctx3.newPage();
-await p3.goto(app + "/admin/recuperar");
+await p3.goto(app + ADMIN + "/recuperar");
 await p3.fill("#email", adminEmail);
 await p3.click("button[type=submit]");
 await p3.waitForSelector("p[role=status]");
@@ -370,7 +398,7 @@ check("llegó el correo de recuperación", !!mail);
 const mailBody = await (await fetch(`http://127.0.0.1:54324/api/v1/message/${mail.ID}`)).json();
 const recoveryUrl = mailBody.Text.match(/https?:\/\/\S+/)[0].replace(/&amp;/g, "&");
 await p3.goto(recoveryUrl);
-await p3.waitForURL((u) => u.pathname === "/admin/mfa", { timeout: 15000 });
+await p3.waitForURL((u) => u.pathname === ADMIN + "/mfa", { timeout: 15000 });
 check(
   "el enlace exige MFA antes de cambiar la contraseña",
   p3.url().includes("siguiente=contrasena"),
@@ -380,7 +408,7 @@ await p3.waitForSelector("#code");
 await new Promise((res) => setTimeout(res, (31 - ((Date.now() / 1000) % 30)) * 1000)); // código nuevo
 await p3.fill("#code", totp(totpSecret));
 await p3.click("button[type=submit]");
-await p3.waitForURL((u) => u.pathname === "/admin/nueva-contrasena", { timeout: 15000 });
+await p3.waitForURL((u) => u.pathname === ADMIN + "/nueva-contrasena", { timeout: 15000 });
 await p3.fill("#password", "corta");
 await p3.evaluate(() => (document.querySelector("form").noValidate = true));
 await p3.click("button[type=submit]");
@@ -392,7 +420,7 @@ check(
 const newPassword = randomPassword();
 await p3.fill("#password", newPassword);
 await p3.click("button[type=submit]");
-await p3.waitForURL((u) => u.pathname === "/admin", { timeout: 15000 });
+await p3.waitForURL((u) => u.pathname === ADMIN, { timeout: 15000 });
 const relogin = await fetch(`${api}/auth/v1/token?grant_type=password`, {
   method: "POST",
   headers: { apikey: pub, "Content-Type": "application/json" },

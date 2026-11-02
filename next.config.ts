@@ -28,7 +28,10 @@ const nextConfig: NextConfig = {
           },
         ]
       : [],
-    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
+    // Solo cuando Supabase corre en este mismo equipo (desarrollo y pruebas locales).
+    dangerouslyAllowLocalIP: Boolean(
+      supabaseUrl && ["127.0.0.1", "localhost"].includes(new URL(supabaseUrl).hostname),
+    ),
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

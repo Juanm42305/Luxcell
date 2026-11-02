@@ -8,7 +8,7 @@ import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { loginSchema } from "@/schemas/auth";
 import { authFieldClass, FormError } from "./auth-card";
 
-export function LoginForm() {
+export function LoginForm({ adminBase }: { adminBase: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
@@ -43,7 +43,7 @@ export function LoginForm() {
       return;
     }
 
-    router.replace("/admin/mfa");
+    router.replace(`${adminBase}/mfa`);
   }
 
   return (
@@ -83,7 +83,7 @@ export function LoginForm() {
         {isPending ? "Entrando…" : "Entrar"}
       </button>
       <Link
-        href="/admin/recuperar"
+        href={`${adminBase}/recuperar`}
         className="flex min-h-11 items-center justify-center text-sm font-medium hover:underline"
       >
         Olvidé mi contraseña

@@ -9,11 +9,13 @@ import { authFieldClass, FormError } from "./auth-card";
 type Enrollment = { factorId: string; qrCode: string; secret: string };
 
 /** Solo se acepta este destino: un parámetro libre permitiría redirecciones abiertas. */
-function getDestination(wantsPasswordChange: boolean) {
-  return wantsPasswordChange ? "/admin/nueva-contrasena" : "/admin";
+function getDestination(adminBase: string, wantsPasswordChange: boolean) {
+  return wantsPasswordChange ? `${adminBase}/nueva-contrasena` : adminBase;
 }
 
-export function MfaForm({ wantsPasswordChange }: { wantsPasswordChange: boolean }) {
+type MfaFormProps = { adminBase: string; wantsPasswordChange: boolean };
+
+export function MfaForm({ adminBase, wantsPasswordChange }: MfaFormProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [verifiedFactorId, setVerifiedFactorId] = useState<string | null>(null);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
@@ -24,7 +26,7 @@ export function MfaForm({ wantsPasswordChange }: { wantsPasswordChange: boolean 
       const supabase = createBrowserSupabase();
       const { data: level } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (level?.currentLevel === "aal2") {
-        window.location.assign(getDestination(wantsPasswordChange));
+        window.location.assign(getDestination(adminBase, wantsPasswordChange));
         return;
       }
       const { data } = await supabase.auth.mfa.listFactors();
@@ -32,7 +34,7 @@ export function MfaForm({ wantsPasswordChange }: { wantsPasswordChange: boolean 
       setIsLoading(false);
     }
     void loadFactors();
-  }, [wantsPasswordChange]);
+  }, [adminBase, wantsPasswordChange]);
 
   async function startEnrollment() {
     setError(null);
@@ -72,7 +74,7 @@ export function MfaForm({ wantsPasswordChange }: { wantsPasswordChange: boolean 
       return;
     }
 
-    window.location.assign(getDestination(wantsPasswordChange));
+    window.location.assign(getDestination(adminBase, wantsPasswordChange));
   }
 
   if (isLoading) return <p className="text-sm text-muted">Cargando…</p>;
