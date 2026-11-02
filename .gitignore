@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variables de entorno: nunca versionar credenciales
+.env
+.env.*
+!.env.example
+
+.vercel/
+.DS_Store
+*.log
