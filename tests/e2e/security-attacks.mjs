@@ -204,9 +204,16 @@ r = await fetch(app + "/auth/callback?code=falso&next=https://malo.example", {
 });
 check(
   "callback no redirige a sitios externos",
-  (r.headers.get("location") ?? "").startsWith(app + ADMIN + "/login"),
+  r.headers.get("location") === app + "/",
   r.headers.get("location"),
 );
+for (const query of ["", "?code=falso", "?error=access_denied"]) {
+  const leak = await fetch(app + "/auth/callback" + query, { redirect: "manual" });
+  check(
+    `callback${query || " sin código"} no revela la ruta secreta`,
+    !(leak.headers.get("location") ?? "").includes(process.env.ADMIN_ACCESS_PATH),
+  );
+}
 r = await fetch(app + "/producto/" + encodeURIComponent("' OR 1=1--"));
 check("slug malicioso da 404", r.status === 404, `HTTP ${r.status}`);
 
