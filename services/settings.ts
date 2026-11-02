@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { businessPlaceholders } from "@/config/site";
+import { fallbackBusinessName } from "@/config/site";
 import { createPublicClient } from "@/lib/supabase/public";
 import { parseBrandColor, parseSocialLinks } from "@/schemas/business-settings";
 
@@ -14,35 +14,31 @@ export const getBusinessSettings = cache(async () => {
     throw new Error("No se pudo cargar la configuración del negocio");
   }
 
-  // Sin todos los datos de identificación del proveedor, el sitio no se indexa ni se da por listo.
+  // Sin un canal de contacto completo el sitio no se indexa y muestra el aviso de preparación.
   const isComplete = Boolean(
-    data?.business_name &&
-    data.legal_name &&
-    data.tax_id &&
-    data.judicial_address &&
-    data.phone &&
-    data.contact_email &&
-    data.whatsapp_number &&
-    data.sales_authorization,
+    data?.business_name && data.whatsapp_number && data.phone && data.contact_email,
   );
 
+  // Los datos ausentes quedan en null y no se muestran: nunca se inventa un valor.
   return {
-    name: data?.business_name ?? businessPlaceholders.name,
-    slogan: data?.slogan ?? businessPlaceholders.slogan,
-    description: data?.description ?? businessPlaceholders.description,
+    name: data?.business_name ?? fallbackBusinessName,
+    slogan: data?.slogan ?? null,
+    description: data?.description ?? null,
     logoUrl: data?.logo_path
       ? supabase.storage.from("business-assets").getPublicUrl(data.logo_path).data.publicUrl
       : null,
     whatsappNumber: data?.whatsapp_number ?? null,
-    contactEmail: data?.contact_email ?? businessPlaceholders.contactEmail,
-    phone: data?.phone ?? businessPlaceholders.phone,
-    commercialAddress: data?.business_address ?? businessPlaceholders.commercialAddress,
-    legalName: data?.legal_name ?? businessPlaceholders.legalName,
-    taxId: data?.tax_id ?? businessPlaceholders.taxId,
-    judicialAddress: data?.judicial_address ?? businessPlaceholders.judicialAddress,
-    salesAuthorization: data?.sales_authorization ?? businessPlaceholders.salesAuthorization,
+    contactEmail: data?.contact_email ?? null,
+    phone: data?.phone ?? null,
+    commercialAddress: data?.business_address ?? null,
+    legalName: data?.legal_name ?? null,
+    taxId: data?.tax_id ?? null,
+    judicialAddress: data?.judicial_address ?? null,
+    salesAuthorization: data?.sales_authorization ?? null,
     socialLinks: parseSocialLinks(data?.social_media),
     brandColor: parseBrandColor(data?.brand_colors),
     isComplete,
   };
 });
+
+export type BusinessSettings = Awaited<ReturnType<typeof getBusinessSettings>>;

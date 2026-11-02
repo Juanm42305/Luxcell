@@ -5,7 +5,8 @@ import { getBusinessSettings } from "@/services/settings";
 import { ProductArt } from "./product-art";
 
 export async function Hero() {
-  const { slogan } = await getBusinessSettings();
+  const { slogan, description } = await getBusinessSettings();
+  const eyebrow = slogan ?? description;
 
   return (
     <section
@@ -14,11 +15,11 @@ export async function Hero() {
     >
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(60%_70%_at_75%_55%,rgb(67_86_255/0.35),transparent_70%)]"
+        className="absolute inset-0 bg-[radial-gradient(60%_70%_at_75%_55%,rgb(255_220_8/0.16),transparent_70%)]"
       />
       <Container className="relative grid items-center gap-6 pt-12 pb-0 lg:min-h-[34rem] lg:grid-cols-2 lg:py-16">
         <div className="animate-rise">
-          <p className="text-sm font-medium text-night-muted">{slogan}</p>
+          {eyebrow && <p className="text-sm font-semibold tracking-wide text-brand">{eyebrow}</p>}
           <h1
             id="titulo-principal"
             className="mt-3 text-[2.6rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl"
@@ -29,7 +30,7 @@ export async function Hero() {
             Explora el catálogo, revisa la disponibilidad y escríbenos directamente por WhatsApp.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href="/catalogo" variant="inverse" size="lg">
+            <ButtonLink href="/catalogo" variant="accent" size="lg">
               Ver catálogo
               <ArrowRight aria-hidden className="size-4" />
             </ButtonLink>
@@ -40,12 +41,12 @@ export async function Hero() {
           <ProductArt
             kind="phone"
             view="back"
-            tone="#5c6a99"
+            tone="#c9a40a"
             className="absolute top-10 left-[-8%] h-[100%] -rotate-[8deg] lg:top-12"
           />
           <ProductArt
             kind="phone"
-            tone="#6d7184"
+            tone="#3a3a3a"
             className="absolute top-0 right-[-8%] h-[108%] rotate-[5deg] motion-safe:animate-float"
           />
         </div>

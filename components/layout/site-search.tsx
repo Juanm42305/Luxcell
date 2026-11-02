@@ -1,16 +1,15 @@
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-/** Formulario GET: funciona sin JavaScript y deja la búsqueda en la URL. */
-export function SiteSearch({
-  id,
-  className,
-  autoFocus,
-}: {
+type SiteSearchProps = {
   id: string;
   className?: string;
   autoFocus?: boolean;
-}) {
+  tone?: "light" | "dark";
+};
+
+/** Formulario GET: funciona sin JavaScript y deja la búsqueda en la URL. */
+export function SiteSearch({ id, className, autoFocus, tone = "light" }: SiteSearchProps) {
   return (
     <form action="/catalogo" role="search" className={cn("relative", className)}>
       <label htmlFor={id} className="sr-only">
@@ -18,7 +17,10 @@ export function SiteSearch({
       </label>
       <Search
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"
+        className={cn(
+          "pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2",
+          tone === "dark" ? "text-night-muted" : "text-muted",
+        )}
       />
       <input
         id={id}
@@ -27,7 +29,12 @@ export function SiteSearch({
         maxLength={80}
         autoFocus={autoFocus}
         placeholder="Buscar por nombre o modelo"
-        className="h-11 w-full rounded-full border border-line bg-surface pr-4 pl-10 text-base transition-colors placeholder:text-muted hover:border-muted focus:border-ink focus:outline-none sm:text-sm"
+        className={cn(
+          "h-11 w-full rounded-full border pr-4 pl-10 text-base transition-colors focus:outline-none sm:text-sm",
+          tone === "dark"
+            ? "border-night-line bg-night-soft text-white placeholder:text-night-muted hover:border-night-muted focus:border-brand"
+            : "border-line bg-surface placeholder:text-muted hover:border-muted focus:border-ink",
+        )}
       />
     </form>
   );

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 /*
- * Identidad visual PROVISIONAL. Los colores de marca se definen como variables para que en la
- * Fase 3 se sobrescriban desde `business_settings.brand_colors` sin tocar los componentes.
+ * Identidad LUX CELL: negro y dorado (#FFDC08, tomado del logo). El dorado se define como variable
+ * para que `business_settings.brand_colors` pueda ajustarlo sin tocar los componentes.
  */
 :root {
-  --brand: #2438e0;
+  --brand: #ffdc08;
 }
 
 @theme inline {
@@ -15,19 +15,20 @@
 }
 
 @theme {
-  --color-ink: #101114;
-  --color-ink-soft: #2a2c32;
-  --color-muted: #5d5f67;
-  --color-line: #e4e4df;
-  --color-paper: #f7f7f4;
-  --color-surface: #ffffff;
-  --color-night: #0b0c0f;
-  --color-night-soft: #17191e;
-  --color-night-line: #2b2e36;
-  --color-night-muted: #a9acb5;
+  --color-brand-strong: #e8c600;
+  /* Dorado oscurecido para texto sobre fondo claro: el dorado puro no tiene contraste suficiente. */
+  --color-brand-ink: #735a00;
 
-  --color-whatsapp: #0b7a4b;
-  --color-whatsapp-strong: #096039;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #262626;
+  --color-muted: #5c5c5c;
+  --color-line: #e5e5e2;
+  --color-paper: #f5f5f3;
+  --color-surface: #ffffff;
+  --color-night: #0a0a0a;
+  --color-night-soft: #171717;
+  --color-night-line: #2e2e2e;
+  --color-night-muted: #a6a6a6;
 
   --color-ok: #0b6b43;
   --color-ok-soft: #e4f4ec;
@@ -77,17 +78,33 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
   .on-night :focus-visible {
-    outline-color: #fff;
+    outline-color: var(--brand);
+  }
+
+  .legal-text ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .legal-text li + li {
+    margin-top: 0.4rem;
+  }
+
+  .legal-text a {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    overflow-wrap: anywhere;
   }
 
   dialog::backdrop {
-    background: rgb(11 12 15 / 0.55);
+    background: rgb(0 0 0 / 0.7);
   }
 }
 

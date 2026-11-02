@@ -1,17 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { legalLinks, navLinks } from "@/config/site";
 import { getBusinessSettings } from "@/services/settings";
 
+const footerLinkClass = "flex min-h-10 items-center text-sm text-white/85 hover:text-brand";
+
 export async function SiteFooter() {
   const settings = await getBusinessSettings();
+  const contact = [settings.legalName, settings.taxId && `NIT ${settings.taxId}`, settings.phone]
+    .concat([settings.contactEmail, settings.judicialAddress, settings.salesAuthorization])
+    .filter(Boolean);
 
   return (
-    <footer className="on-night bg-night text-white">
+    <footer className="on-night border-t border-night-line bg-night text-white">
       <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-semibold">{settings.name}</p>
-          <p className="mt-2 text-sm text-night-muted">{settings.slogan}</p>
+          <Image
+            src="/brand/luxcell-emblema.webp"
+            alt={settings.name}
+            width={80}
+            height={80}
+            className="size-20"
+          />
+          {settings.description && (
+            <p className="mt-4 text-sm font-semibold text-brand">{settings.description}</p>
+          )}
         </div>
 
         <nav aria-label="Enlaces del sitio">
@@ -19,10 +33,7 @@ export async function SiteFooter() {
           <ul className="mt-2">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="flex min-h-10 items-center text-sm hover:underline"
-                >
+                <Link href={link.href} className={footerLinkClass}>
                   {link.label}
                 </Link>
               </li>
@@ -35,20 +46,27 @@ export async function SiteFooter() {
           <ul className="mt-2">
             {legalLinks.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="flex min-h-10 items-center text-sm hover:underline"
-                >
+                <Link href={link.href} className={footerLinkClass}>
                   {link.label}
                 </Link>
               </li>
             ))}
+            <li>
+              <a
+                href="https://www.sic.gov.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={footerLinkClass}
+              >
+                Superintendencia de Industria y Comercio
+              </a>
+            </li>
           </ul>
         </nav>
 
-        <div>
-          <h2 className="text-sm font-medium text-night-muted">Redes sociales</h2>
-          {settings.socialLinks.length > 0 ? (
+        {settings.socialLinks.length > 0 && (
+          <div>
+            <h2 className="text-sm font-medium text-night-muted">Síguenos</h2>
             <ul className="mt-2">
               {settings.socialLinks.map((social) => (
                 <li key={social.href}>
@@ -56,27 +74,24 @@ export async function SiteFooter() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex min-h-10 items-center text-sm hover:underline"
+                    className={footerLinkClass}
                   >
                     {social.label}
                   </a>
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="mt-4 text-sm">[Redes sociales pendientes]</p>
-          )}
-        </div>
+          </div>
+        )}
       </Container>
 
       <div className="border-t border-night-line">
         <Container className="py-6 text-xs leading-relaxed text-night-muted">
           <h2 className="sr-only">Identificación del proveedor</h2>
           <p>
-            {settings.legalName} · NIT {settings.taxId} · {settings.judicialAddress} ·{" "}
-            {settings.phone} · {settings.contactEmail}
+            © {new Date().getFullYear()} {settings.name}
+            {contact.length > 0 && ` · ${contact.join(" · ")}`}
           </p>
-          <p className="mt-1">{settings.salesAuthorization}</p>
         </Container>
       </div>
     </footer>

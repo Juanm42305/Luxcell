@@ -12,7 +12,7 @@ export function SectionHeading({ id, eyebrow, title, action }: SectionHeadingPro
   return (
     <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
       <div>
-        {eyebrow && <p className="mb-1.5 text-sm font-medium text-brand">{eyebrow}</p>}
+        {eyebrow && <p className="mb-1.5 text-sm font-medium text-brand-ink">{eyebrow}</p>}
         <h2 id={id} className="text-2xl font-semibold tracking-tight text-balance sm:text-4xl">
           {title}
         </h2>
