@@ -1,33 +1,36 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
-import { legalLinks } from "@/config/site";
+import { LEGAL_VERSION } from "@/features/legal/acceptance";
+import { getLegalDocument } from "@/features/legal/documents";
+import { getBusinessSettings } from "@/services/settings";
 
 type LegalPageProps = { params: Promise<{ slug: string }> };
 
-function findLegalPage(slug: string) {
-  return legalLinks.find((link) => link.href === `/legal/${slug}`);
-}
-
 export async function generateMetadata({ params }: LegalPageProps): Promise<Metadata> {
-  const page = findLegalPage((await params).slug);
-  return { title: page?.label ?? "Página no encontrada" };
+  const document = getLegalDocument((await params).slug, await getBusinessSettings());
+  return { title: document?.title ?? "Página no encontrada" };
 }
 
-/** Marcador de diseño: los documentos legales se redactan en la Fase 6. */
 export default async function LegalPage({ params }: LegalPageProps) {
-  const page = findLegalPage((await params).slug);
-  if (!page) notFound();
+  const document = getLegalDocument((await params).slug, await getBusinessSettings());
+  if (!document) notFound();
 
   return (
-    <Container className="max-w-3xl py-12 sm:py-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
-        {page.label}
-      </h1>
-      <p className="mt-5 rounded-2xl border border-dashed border-line p-5 text-ink-soft">
-        [Documento pendiente. Se redacta con los datos reales del negocio y debe pasar por revisión
-        jurídica antes de publicarse.]
-      </p>
+    <Container className="py-12 sm:py-16">
+      <article className="max-w-3xl">
+        <p className="text-sm font-medium text-brand-ink">Versión {LEGAL_VERSION}</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+          {document.title}
+        </h1>
+        <div className="legal-text mt-6 space-y-4 text-ink-soft">{document.intro}</div>
+        {document.sections.map((section) => (
+          <section key={section.heading} className="mt-10">
+            <h2 className="text-xl font-semibold tracking-tight text-ink">{section.heading}</h2>
+            <div className="legal-text mt-3 space-y-3 text-ink-soft">{section.body}</div>
+          </section>
+        ))}
+      </article>
     </Container>
   );
 }

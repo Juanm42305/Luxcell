@@ -2,16 +2,17 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "whatsapp" | "ghost" | "inverse";
+type Variant = "primary" | "secondary" | "accent" | "ghost" | "inverse";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full text-center font-medium transition-[background-color,border-color,color,transform] duration-200 ease-soft active:scale-[0.98] disabled:pointer-events-none";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full text-center font-medium transition-[background-color,border-color,color,transform] duration-200 ease-soft active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
   primary: "bg-ink text-white hover:bg-ink-soft",
   secondary: "border border-line bg-surface text-ink hover:border-ink",
-  whatsapp: "bg-whatsapp text-white hover:bg-whatsapp-strong",
+  // Dorado de marca con texto negro: contraste de sobra en fondo claro y oscuro.
+  accent: "bg-brand text-ink hover:bg-brand-strong",
   ghost: "text-ink hover:bg-ink/5",
   inverse: "bg-white text-ink hover:bg-white/85",
 };

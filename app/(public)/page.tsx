@@ -36,6 +36,12 @@ export default async function HomePage() {
     getAvailableProducts(),
   ]);
 
+  const contactRows = [
+    { label: "Dirección", value: settings.commercialAddress },
+    { label: "Teléfono", value: settings.phone },
+    { label: "Correo", value: settings.contactEmail },
+  ].filter((row): row is { label: string; value: string } => Boolean(row.value));
+
   return (
     <>
       <Hero />
@@ -96,21 +102,23 @@ export default async function HomePage() {
               <h2 id="titulo-negocio" className="text-2xl font-semibold tracking-tight sm:text-4xl">
                 {settings.name}
               </h2>
-              <p className="mt-3 max-w-md text-night-muted">{settings.description}</p>
-              <dl className="mt-6 space-y-2 text-sm">
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="text-night-muted">Dirección:</dt>
-                  <dd>{settings.commercialAddress}</dd>
-                </div>
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="text-night-muted">Teléfono:</dt>
-                  <dd>{settings.phone}</dd>
-                </div>
-                <div className="flex flex-wrap gap-x-2">
-                  <dt className="text-night-muted">Correo:</dt>
-                  <dd>{settings.contactEmail}</dd>
-                </div>
-              </dl>
+              {settings.description && (
+                <p className="mt-3 max-w-md font-semibold text-brand">{settings.description}</p>
+              )}
+              <p className="mt-3 max-w-md text-night-muted">
+                Tienda virtual de celulares, accesorios y tecnología. Atendemos por WhatsApp e
+                Instagram.
+              </p>
+              {contactRows.length > 0 && (
+                <dl className="mt-6 space-y-2 text-sm">
+                  {contactRows.map((row) => (
+                    <div key={row.label} className="flex flex-wrap gap-x-2">
+                      <dt className="text-night-muted">{row.label}:</dt>
+                      <dd>{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
               <div className="mt-8 flex flex-wrap gap-3">
                 <WhatsAppLink
                   phoneNumber={settings.whatsappNumber}
@@ -129,7 +137,7 @@ export default async function HomePage() {
                 <li key={step.title} className="flex gap-4">
                   <span
                     aria-hidden
-                    className="grid size-9 shrink-0 place-items-center rounded-full border border-night-line text-sm font-medium"
+                    className="grid size-9 shrink-0 place-items-center rounded-full border border-brand text-sm font-semibold text-brand"
                   >
                     {index + 1}
                   </span>

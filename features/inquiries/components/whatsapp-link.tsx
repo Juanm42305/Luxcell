@@ -24,7 +24,7 @@ export function WhatsAppLink({
   className,
 }: WhatsAppLinkProps) {
   const url = buildWhatsAppUrl(phoneNumber, message);
-  const variant = tone === "solid" ? "whatsapp" : "secondary";
+  const variant = tone === "solid" ? "accent" : "secondary";
 
   // Sin número configurado no hay enlace: nunca se inventa un destino.
   if (!url) {

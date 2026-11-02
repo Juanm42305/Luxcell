@@ -1,28 +1,16 @@
-/**
- * Marcadores que se muestran mientras el negocio no complete `business_settings`.
- * Todo valor entre corchetes es un dato pendiente, no información real.
- */
-export const businessPlaceholders = {
-  name: "[Nombre comercial]",
-  slogan: "[Eslogan del negocio]",
-  description: "[Descripción del negocio: la entrega el negocio]",
-  contactEmail: "[Correo de atención]",
-  phone: "[Teléfono]",
-  commercialAddress: "[Dirección comercial]",
-  legalName: "[Nombre o razón social]",
-  taxId: "[NIT]",
-  judicialAddress: "[Dirección de notificación judicial]",
-  salesAuthorization: "[Número de autorización de venta de equipos móviles]",
-};
+/** Logo por defecto (versión horizontal). Se reemplaza si `business_settings.logo_path` tiene valor. */
+export const defaultLogo = { src: "/brand/luxcell-logo.webp", width: 362, height: 96 };
+
+export const fallbackBusinessName = "LUX CELL";
 
 export const siteDescription =
-  "Catálogo de celulares y accesorios tecnológicos con contacto directo por WhatsApp.";
+  "Celulares, accesorios y tecnología en LUX CELL. Consulta disponibilidad y escríbenos por WhatsApp.";
 
 export const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/catalogo", label: "Catálogo" },
   { href: "/#categorias", label: "Categorías" },
-  { href: "/#negocio", label: "El negocio" },
+  { href: "/#negocio", label: "Nosotros" },
 ];
 
 export const legalLinks = [

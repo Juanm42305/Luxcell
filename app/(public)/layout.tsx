@@ -3,6 +3,7 @@ import { DemoBanner } from "@/components/layout/demo-banner";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { LegalAcceptanceDialog } from "@/features/legal/components/legal-acceptance-dialog";
 import { getBusinessSettings } from "@/services/settings";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
@@ -19,6 +20,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
       <main className="flex-1">{children}</main>
       <SiteFooter />
       <MobileNav whatsappNumber={whatsappNumber} />
+      <LegalAcceptanceDialog />
     </div>
   );
 }

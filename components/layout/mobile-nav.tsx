@@ -26,7 +26,7 @@ function NavItem({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={cn(itemClass, active ? "text-ink" : "text-muted")}
+      className={cn(itemClass, active ? "text-brand" : "text-night-muted")}
     >
       <Icon aria-hidden className="size-5" strokeWidth={active ? 2.2 : 1.8} />
       {label}
@@ -44,7 +44,7 @@ export function MobileNav({ whatsappNumber }: { whatsappNumber: string | null })
     <>
       <nav
         aria-label="Navegación móvil"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="on-night fixed inset-x-0 bottom-0 z-40 border-t border-night-line bg-night/95 pb-[env(safe-area-inset-bottom)] text-white backdrop-blur-xl md:hidden"
       >
         <ul className="grid grid-cols-4">
           <li>
@@ -62,7 +62,7 @@ export function MobileNav({ whatsappNumber }: { whatsappNumber: string | null })
             <button
               type="button"
               onClick={() => searchDialog.current?.showModal()}
-              className={cn(itemClass, "text-muted")}
+              className={cn(itemClass, "text-night-muted")}
             >
               <Search aria-hidden className="size-5" strokeWidth={1.8} />
               Buscar
@@ -74,14 +74,14 @@ export function MobileNav({ whatsappNumber }: { whatsappNumber: string | null })
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn(itemClass, "text-whatsapp")}
+                className={cn(itemClass, "text-brand")}
               >
                 <MessageCircle aria-hidden className="size-5" strokeWidth={2} />
                 WhatsApp
               </a>
             ) : (
               <span
-                className={cn(itemClass, "text-muted")}
+                className={cn(itemClass, "text-night-muted")}
                 title="Número de WhatsApp pendiente de configurar"
               >
                 <MessageCircle aria-hidden className="size-5" strokeWidth={1.8} />
