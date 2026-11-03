@@ -46,7 +46,11 @@ export default async function HomePage() {
     <>
       <Hero />
 
-      <section id="categorias" aria-labelledby="titulo-categorias" className="py-12 sm:py-16">
+      <section
+        id="categorias"
+        aria-labelledby="titulo-categorias"
+        className="reveal py-12 sm:py-16"
+      >
         <Container>
           <SectionHeading id="titulo-categorias" title="Categorías" />
           <CategoryGrid categories={categories} />
@@ -54,7 +58,7 @@ export default async function HomePage() {
       </section>
 
       {featured.length > 0 && (
-        <section aria-labelledby="titulo-destacados" className="pb-12 sm:pb-16">
+        <section aria-labelledby="titulo-destacados" className="reveal pb-12 sm:pb-16">
           <Container>
             <SectionHeading
               id="titulo-destacados"
@@ -69,7 +73,7 @@ export default async function HomePage() {
       {latest.length > 0 && (
         <section
           aria-labelledby="titulo-novedades"
-          className="border-y border-line bg-surface py-12 sm:py-16"
+          className="reveal border-y border-line bg-surface py-12 sm:py-16"
         >
           <Container>
             <SectionHeading
@@ -83,7 +87,7 @@ export default async function HomePage() {
       )}
 
       {available.length > 0 && (
-        <section aria-labelledby="titulo-disponibles" className="py-12 sm:py-16">
+        <section aria-labelledby="titulo-disponibles" className="reveal py-12 sm:py-16">
           <Container>
             <SectionHeading
               id="titulo-disponibles"
@@ -95,7 +99,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section id="negocio" aria-labelledby="titulo-negocio" className="pb-12 sm:pb-16">
+      <section id="negocio" aria-labelledby="titulo-negocio" className="reveal pb-12 sm:pb-16">
         <Container>
           <div className="on-night grid gap-10 rounded-[2rem] bg-night p-6 text-white sm:p-10 lg:grid-cols-2 lg:p-14">
             <div>

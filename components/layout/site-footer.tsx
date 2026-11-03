@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { legalLinks, navLinks } from "@/config/site";
+import { cn } from "@/lib/cn";
 import { getBusinessSettings } from "@/services/settings";
 
 const footerLinkClass = "flex min-h-10 items-center text-sm text-white/85 hover:text-brand";
@@ -13,18 +14,23 @@ export async function SiteFooter() {
     .filter(Boolean);
 
   return (
-    <footer className="on-night border-t border-night-line bg-night text-white">
-      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
+    <footer className="on-night reveal border-t border-night-line bg-night text-white">
+      <Container
+        className={cn(
+          "grid gap-10 py-12 sm:grid-cols-2",
+          settings.socialLinks.length > 0 ? "lg:grid-cols-4" : "lg:grid-cols-3",
+        )}
+      >
+        <div className="flex flex-col items-center text-center">
           <Image
             src="/brand/luxcell-emblema.webp"
             alt={settings.name}
-            width={80}
-            height={80}
-            className="size-20"
+            width={96}
+            height={96}
+            className="size-24"
           />
           {settings.description && (
-            <p className="mt-4 text-sm font-semibold text-brand">{settings.description}</p>
+            <p className="mt-4 max-w-56 text-sm font-semibold text-brand">{settings.description}</p>
           )}
         </div>
 

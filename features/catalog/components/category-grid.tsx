@@ -8,6 +8,7 @@ const artTone = "#c9cad0";
 
 /** Logos de marca por categoría. Las marcas pertenecen a sus titulares y solo identifican productos. */
 const categoryLogos: Record<string, { src: string; width: number; height: number }> = {
+  iphone: { src: "/brand/categorias/iphone.webp", width: 131, height: 160 },
   samsung: { src: "/brand/categorias/samsung.webp", width: 240, height: 41 },
   xiaomi: { src: "/brand/categorias/xiaomi.webp", width: 160, height: 160 },
   motorola: { src: "/brand/categorias/motorola.webp", width: 240, height: 133 },

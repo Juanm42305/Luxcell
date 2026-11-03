@@ -108,6 +108,49 @@
   }
 }
 
+/*
+ * Animaciones ligadas al desplazamiento, solo con CSS (sin JavaScript ni librerías). En navegadores
+ * que no las soportan o con "reducir movimiento", el contenido se ve igual pero estático.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Cada sección aparece suavemente al entrar en pantalla. */
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+
+    /* La cabecera se vuelve más sólida y gana sombra al bajar. */
+    .header-scroll {
+      animation: header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 120px;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes header-solid {
+  from {
+    box-shadow: 0 0 0 transparent;
+  }
+  to {
+    background-color: rgb(10 10 10 / 1);
+    box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

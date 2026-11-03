@@ -94,7 +94,7 @@ export default async function AboutPage() {
         </Container>
       </section>
 
-      <section aria-labelledby="titulo-prioridad" className="py-14 sm:py-20">
+      <section aria-labelledby="titulo-prioridad" className="reveal py-14 sm:py-20">
         <Container className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <h2 id="titulo-prioridad" className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -134,7 +134,7 @@ export default async function AboutPage() {
 
       <section
         aria-labelledby="titulo-encontraras"
-        className="border-y border-line bg-surface py-14 sm:py-20"
+        className="reveal border-y border-line bg-surface py-14 sm:py-20"
       >
         <Container>
           <h2 id="titulo-encontraras" className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -156,7 +156,7 @@ export default async function AboutPage() {
         </Container>
       </section>
 
-      <section aria-labelledby="titulo-contacto" className="py-14 sm:py-20">
+      <section aria-labelledby="titulo-contacto" className="reveal py-14 sm:py-20">
         <Container>
           <div className="on-night grid gap-10 overflow-hidden rounded-[2rem] bg-night p-6 text-white sm:p-10 lg:grid-cols-2 lg:p-14">
             <div>
