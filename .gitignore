@@ -17,3 +17,6 @@ media-originales/
 .vercel/
 .DS_Store
 *.log
+
+# Enlace privado del panel (nunca se versiona)
+ACCESO-PANEL.txt

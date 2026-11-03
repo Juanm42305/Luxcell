@@ -19,7 +19,7 @@ export const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/catalogo", label: "Catálogo" },
   { href: "/#categorias", label: "Categorías" },
-  { href: "/#negocio", label: "Nosotros" },
+  { href: "/nosotros", label: "Nosotros" },
 ];
 
 export const legalLinks = [

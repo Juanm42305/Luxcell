@@ -106,8 +106,8 @@ export default async function HomePage() {
                 <p className="mt-3 max-w-md font-semibold text-brand">{settings.description}</p>
               )}
               <p className="mt-3 max-w-md text-night-muted">
-                Tienda virtual de celulares, accesorios y tecnología. Atendemos por WhatsApp e
-                Instagram.
+                Celulares iPhone, Android y accesorios tecnológicos en Montería, Córdoba. Atendemos
+                por WhatsApp e Instagram.
               </p>
               {contactRows.length > 0 && (
                 <dl className="mt-6 space-y-2 text-sm">
@@ -126,8 +126,8 @@ export default async function HomePage() {
                   label="Escríbenos por WhatsApp"
                   size="lg"
                 />
-                <ButtonLink href="/catalogo" variant="inverse" size="lg">
-                  Ver catálogo
+                <ButtonLink href="/nosotros" variant="inverse" size="lg">
+                  Conócenos
                 </ButtonLink>
               </div>
             </div>
