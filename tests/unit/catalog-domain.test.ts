@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { formatCop } from "@/lib/format";
 import { getStockStatus } from "@/lib/inventory";
 import { toSearchPattern } from "@/lib/search";
+import { toSlug } from "@/lib/slug";
 import { buildProductMessage, buildWhatsAppUrl, getProductContact } from "@/lib/whatsapp";
 import { parseBrandColor, parseSocialLinks } from "@/schemas/business-settings";
 import { parseCatalogFilters } from "@/schemas/catalog-filters";
@@ -75,6 +76,24 @@ describe("toSearchPattern", () => {
 
   it("trata los comodines como texto literal", () => {
     expect(toSearchPattern("100%_a\\")).toBe("%100\\%\\_a\\\\%");
+  });
+});
+
+describe("toSlug", () => {
+  it("genera identificadores válidos", () => {
+    expect(toSlug("iPhone 15 Pro (128 GB)")).toBe("iphone-15-pro-128-gb");
+    expect(toSlug("  ¡Audífonos Bluetooth!  ")).toBe("audifonos-bluetooth");
+    expect(toSlug("---")).toBe("");
+  });
+
+  it("es rápido con entradas diseñadas para causar backtracking", () => {
+    const start = performance.now();
+    toSlug("-".repeat(50_000) + "a" + "-".repeat(50_000));
+    expect(performance.now() - start).toBeLessThan(200);
+  });
+
+  it("no termina en guion tras recortar a 120 caracteres", () => {
+    expect(toSlug("a".repeat(119) + " b")).not.toMatch(/-$/);
   });
 });
 

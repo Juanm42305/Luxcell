@@ -6,7 +6,6 @@ export function ProductRail({ products, label }: { products: PublicProduct[]; la
   return (
     <ul
       aria-label={label}
-      tabIndex={0}
       className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:-mx-8 lg:scroll-px-8 lg:px-8"
     >
       {products.map((product) => (

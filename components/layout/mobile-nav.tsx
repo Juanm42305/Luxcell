@@ -98,7 +98,7 @@ export function MobileNav({ whatsappNumber }: { whatsappNumber: string | null })
         className="m-0 w-full max-w-none rounded-b-3xl bg-surface p-4 pt-[max(1rem,env(safe-area-inset-top))] md:hidden"
       >
         <div className="flex items-center gap-2">
-          <SiteSearch id="busqueda-movil" className="flex-1" autoFocus />
+          <SiteSearch id="busqueda-movil" className="flex-1" />
           <button
             type="button"
             aria-label="Cerrar búsqueda"

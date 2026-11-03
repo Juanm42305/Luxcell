@@ -4,12 +4,11 @@ import { cn } from "@/lib/cn";
 type SiteSearchProps = {
   id: string;
   className?: string;
-  autoFocus?: boolean;
   tone?: "light" | "dark";
 };
 
 /** Formulario GET: funciona sin JavaScript y deja la búsqueda en la URL. */
-export function SiteSearch({ id, className, autoFocus, tone = "light" }: SiteSearchProps) {
+export function SiteSearch({ id, className, tone = "light" }: SiteSearchProps) {
   return (
     <form action="/catalogo" role="search" className={cn("relative", className)}>
       <label htmlFor={id} className="sr-only">
@@ -27,7 +26,6 @@ export function SiteSearch({ id, className, autoFocus, tone = "light" }: SiteSea
         name="q"
         type="search"
         maxLength={80}
-        autoFocus={autoFocus}
         placeholder="Buscar por nombre o modelo"
         className={cn(
           "h-11 w-full rounded-full border pr-4 pl-10 text-base transition-colors focus:outline-none sm:text-sm",
