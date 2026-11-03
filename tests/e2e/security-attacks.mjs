@@ -12,8 +12,12 @@ const pub = process.env.PUB;
 const secret = process.env.SEC;
 let failures = 0;
 const randomPassword = () => crypto.randomBytes(12).toString("hex") + "aA1";
+const clean = (value) =>
+  String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .slice(0, 300);
 const check = (name, ok, extra = "") => {
-  console.log(`${ok ? "OK  " : "FAIL"} ${name}${extra ? " :: " + extra : ""}`);
+  console.log(`${ok ? "OK  " : "FAIL"} ${clean(name)}${extra ? " :: " + clean(extra) : ""}`);
   if (!ok) failures++;
 };
 

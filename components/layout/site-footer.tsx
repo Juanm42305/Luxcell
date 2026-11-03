@@ -92,6 +92,20 @@ export async function SiteFooter() {
             © {new Date().getFullYear()} {settings.name}
             {contact.length > 0 && ` · ${contact.join(" · ")}`}
           </p>
+          <p className="mt-2">
+            Las marcas y logos de terceros pertenecen a sus titulares y se usan solo para
+            identificar productos. El robot de Android se reproduce a partir de trabajo creado y
+            compartido por Google, según la licencia{" "}
+            <a
+              href="https://creativecommons.org/licenses/by/3.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-brand"
+            >
+              Creative Commons Atribución 3.0
+            </a>
+            .
+          </p>
         </Container>
       </div>
     </footer>

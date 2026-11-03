@@ -13,8 +13,12 @@ const api = "http://127.0.0.1:54321";
 const ADMIN = "/" + process.env.ADMIN_ACCESS_PATH;
 const secret = process.env.SEC;
 let failures = 0;
+const clean = (value) =>
+  String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .slice(0, 300);
 const check = (name, ok, extra = "") => {
-  console.log(`${ok ? "OK  " : "FAIL"} ${name}${extra ? " :: " + extra : ""}`);
+  console.log(`${ok ? "OK  " : "FAIL"} ${clean(name)}${extra ? " :: " + clean(extra) : ""}`);
   if (!ok) failures++;
 };
 
@@ -171,14 +175,19 @@ const imageRow = await (
   await fetch(`${api}/rest/v1/product_images?select=storage_path`, { headers: adminApi })
 ).json();
 const stored = imageRow.at(-1).storage_path;
+// Solo se usa en una URL si tiene exactamente la forma esperada: <uuid>/<uuid>.webp
+if (!/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/.test(stored))
+  throw new Error("Ruta de imagen inesperada");
+const storedUrl = new URL(
+  `/storage/v1/object/public/product-images/${stored.split("/").map(encodeURIComponent).join("/")}`,
+  api,
+);
 check(
   "se guarda con nombre aleatorio y extensión .webp",
   /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/.test(stored),
   stored,
 );
-const publicBytes = Buffer.from(
-  await (await fetch(`${api}/storage/v1/object/public/product-images/${stored}`)).arrayBuffer(),
-);
+const publicBytes = Buffer.from(await (await fetch(storedUrl)).arrayBuffer());
 check(
   "el archivo publicado es WebP real",
   publicBytes.subarray(0, 4).toString() === "RIFF" &&
@@ -235,7 +244,7 @@ await page.goto(productUrl);
 await page.getByRole("button", { name: "Eliminar producto" }).click();
 await page.getByRole("button", { name: "Sí, eliminar" }).click();
 await page.waitForURL((u) => u.searchParams.get("eliminado") === "1", { timeout: 15000 });
-const gone = await fetch(`${api}/storage/v1/object/public/product-images/${stored}`);
+const gone = await fetch(storedUrl);
 check(
   "al eliminar, la foto desaparece del almacenamiento",
   gone.status >= 400,

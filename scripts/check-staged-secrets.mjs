@@ -1,8 +1,7 @@
 // Bloquea el commit si lo preparado parece contener una credencial. Es una red de seguridad local:
-// el escaneo completo lo hace gitleaks en CI.
-import { execFileSync } from "node:child_process";
-
-const git = (...args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 2 ** 28 });
+// el escaneo completo lo hace gitleaks en CI. Recibe por la entrada estándar el resultado de
+// `git diff --cached` (ver .githooks/pre-commit), así no ejecuta ningún programa por su cuenta.
+import { readFileSync } from "node:fs";
 
 const secretPatterns = [
   ["clave secreta de Supabase", /sb_secret_[A-Za-z0-9_-]{10,}/],
@@ -14,24 +13,27 @@ const secretPatterns = [
   ["clave privada", /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
 ];
 
-const files = git("diff", "--cached", "--name-only", "--diff-filter=ACMR")
-  .split("\n")
-  .filter(Boolean);
-const problems = [];
+const diff = readFileSync(0, "utf8");
+const problems = new Set();
+let currentFile = "";
 
-for (const file of files) {
-  if (/(^|\/)\.env(\.|$)/.test(file) && !file.endsWith(".env.example")) {
-    problems.push(`${file}: los archivos .env no se versionan`);
+for (const line of diff.split(/\r?\n/)) {
+  const header = /^\+\+\+ b\/(.+)$/.exec(line);
+  if (header) {
+    currentFile = header[1];
+    if (/(^|\/)\.env(\.|$)/.test(currentFile) && !currentFile.endsWith(".env.example")) {
+      problems.add(`${currentFile}: los archivos .env no se versionan`);
+    }
     continue;
   }
-  const content = git("show", `:${file}`);
+  // Solo las líneas agregadas. Nunca se imprime el valor encontrado.
+  if (!line.startsWith("+") || line.startsWith("+++")) continue;
   for (const [label, pattern] of secretPatterns) {
-    // Nunca se imprime el valor encontrado.
-    if (pattern.test(content)) problems.push(`${file}: posible ${label}`);
+    if (pattern.test(line)) problems.add(`${currentFile}: posible ${label}`);
   }
 }
 
-if (problems.length > 0) {
-  console.error("Commit bloqueado por posibles credenciales:\n- " + problems.join("\n- "));
+if (problems.size > 0) {
+  console.error("Commit bloqueado por posibles credenciales:\n- " + [...problems].join("\n- "));
   process.exit(1);
 }

@@ -1,2 +1,2 @@
 #!/bin/sh
-node scripts/check-staged-secrets.mjs
+git diff --cached --no-color -U0 --diff-filter=ACMR | node scripts/check-staged-secrets.mjs
