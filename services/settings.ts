@@ -1,18 +1,32 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { CATALOG_CACHE, CATALOG_TAG } from "@/lib/cache-tags";
 import { fallbackBusinessName } from "@/config/site";
 import { createPublicClient } from "@/lib/supabase/public";
 import { parseBrandColor, parseSocialLinks } from "@/schemas/business-settings";
 
-/** Una sola consulta por petición, aunque varios componentes pidan la configuración. */
+/** Fila de configuración en la caché compartida; el panel la invalida al guardar. */
+const fetchSettingsRow = unstable_cache(
+  async () => {
+    const { data, error } = await createPublicClient()
+      .from("business_settings")
+      .select("*")
+      .maybeSingle();
+    if (error) {
+      console.error("No se pudo leer business_settings", error.code);
+      throw new Error("No se pudo cargar la configuración del negocio");
+    }
+    return data;
+  },
+  ["negocio:configuracion"],
+  { tags: [CATALOG_TAG], revalidate: CATALOG_CACHE.revalidateSeconds },
+);
+
+/** Una sola lectura por petición, aunque varios componentes pidan la configuración. */
 export const getBusinessSettings = cache(async () => {
   const supabase = createPublicClient();
-  const { data, error } = await supabase.from("business_settings").select("*").maybeSingle();
-
-  if (error) {
-    console.error("No se pudo leer business_settings", error.code);
-    throw new Error("No se pudo cargar la configuración del negocio");
-  }
+  const data = await fetchSettingsRow();
 
   // Sin un canal de contacto completo el sitio no se indexa y muestra el aviso de preparación.
   const isComplete = Boolean(

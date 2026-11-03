@@ -153,7 +153,17 @@ check(
   "el HTML no contiene la clave secreta",
   !html.includes(secret) && !html.includes("sb_secret_"),
 );
-check("noindex mientras faltan datos", /<meta name="robots" content="noindex/.test(html));
+const [biz] = await (
+  await rest("business_settings?select=business_name,whatsapp_number,phone,contact_email")
+).json();
+const bizComplete = Boolean(
+  biz.business_name && biz.whatsapp_number && biz.phone && biz.contact_email,
+);
+const hasNoindex = /<meta name="robots" content="noindex/.test(html);
+check(
+  bizComplete ? "indexable con los datos completos" : "noindex mientras faltan datos",
+  bizComplete ? !hasNoindex : hasNoindex,
+);
 const nonce1 = csp.match(/nonce-([^']+)/)[1];
 const r2 = await fetch(app + "/");
 check(

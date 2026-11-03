@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { ImageRejectedError, processImage } from "@/lib/images/process";
 import { formToObject, settingsSchema, toFieldErrors, uploadPathSchema } from "@/schemas/admin";
 import { requireAdmin } from "@/services/admin-session";
+import { invalidateCatalog } from "../invalidate";
 import { type ActionState, databaseErrorMessage } from "../action-state";
 
 export async function saveSettings(_: ActionState, formData: FormData): Promise<ActionState> {
@@ -38,7 +38,7 @@ export async function saveSettings(_: ActionState, formData: FormData): Promise<
     .eq("id", true);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Configuración guardada." };
 }
 
@@ -71,7 +71,7 @@ export async function publishLogo(quarantinePath: string): Promise<ActionState> 
     if (previous?.logo_path)
       await supabase.storage.from("business-assets").remove([previous.logo_path]);
 
-    revalidatePath("/", "layout");
+    invalidateCatalog();
     return { status: "success", message: "Logo actualizado." };
   } catch (error) {
     if (error instanceof ImageRejectedError) return { status: "error", message: error.message };
@@ -91,6 +91,6 @@ export async function removeLogo(): Promise<ActionState> {
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
   if (previous?.logo_path)
     await supabase.storage.from("business-assets").remove([previous.logo_path]);
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Se usa de nuevo el logo predeterminado." };
 }

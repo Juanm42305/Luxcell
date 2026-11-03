@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { adminHref } from "@/lib/admin-path";
@@ -12,6 +11,7 @@ import {
   toFieldErrors,
 } from "@/schemas/admin";
 import { requireAdmin } from "@/services/admin-session";
+import { invalidateCatalog } from "../invalidate";
 import { type ActionState, databaseErrorMessage } from "../action-state";
 
 type ProductInput = z.infer<typeof productSchema>;
@@ -57,7 +57,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
 
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   redirect(adminHref(`/productos/${data.id}?creado=1`));
 }
 
@@ -82,7 +82,7 @@ export async function updateProduct(
   const { error } = await supabase.from("products").update(toRow(parsed.data)).eq("id", productId);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Producto guardado." };
 }
 
@@ -112,7 +112,7 @@ export async function updateStock(
   });
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Existencias actualizadas." };
 }
 
@@ -134,6 +134,6 @@ export async function deleteProduct(productId: string): Promise<ActionState> {
     await supabase.storage.from("product-images").remove(images.map((image) => image.storage_path));
   }
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   redirect(adminHref("/productos?eliminado=1"));
 }

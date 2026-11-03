@@ -73,6 +73,26 @@ Flujo: GitHub → CI → Vercel. Cada rama genera una vista previa y `main` publ
 3. Las vistas previas usan esta misma base de datos si comparten variables. Mientras no exista un
    proyecto de pruebas, no usar datos personales reales.
 
+## 5. Firewall de Vercel (protección contra abuso)
+
+Vercel aplica protección automática contra DDoS a nivel de red en todos los planes. Además, en
+**Firewall → Configure → Add New → Rule** (se puede describir la regla en lenguaje natural con
+**Generate Rule**):
+
+1. **Límite de peticiones por IP:** _"Rate limit all requests except paths starting with /\_next/
+   to 200 requests per minute per IP, then challenge"_. El plan Hobby permite 1 regla de este tipo.
+2. **Bloqueo de escáneres:** _"Deny requests where path ends with .env, .git, .bak, .sql or .php,
+   or path contains wp-admin, wp-login, phpmyadmin or xmlrpc"_.
+
+Publicar con **Review Changes → Publish**. Durante un ataque en curso: **Firewall → Attack Mode**
+exige verificación a todo visitante durante 1, 6 o 24 horas.
+
+## Caché de datos
+
+Las lecturas públicas (catálogo, categorías, marcas, configuración) se guardan 5 minutos. Todo
+cambio hecho desde el panel la invalida al instante; un cambio hecho directamente en el SQL Editor
+de Supabase puede tardar hasta 5 minutos en verse.
+
 ## Verificación tras cada despliegue
 
 - `https://securityheaders.com` sobre el dominio.

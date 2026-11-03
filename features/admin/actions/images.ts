@@ -1,10 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ImageRejectedError, processImage } from "@/lib/images/process";
 import { uploadPathSchema } from "@/schemas/admin";
 import { requireAdmin } from "@/services/admin-session";
+import { invalidateCatalog } from "../invalidate";
 import type { ActionState } from "../action-state";
 
 const QUARANTINE = "uploads-quarantine";
@@ -60,7 +60,7 @@ export async function publishProductImage(
       return { status: "error", message: "No se pudo registrar la imagen." };
     }
 
-    revalidatePath("/", "layout");
+    invalidateCatalog();
     return { status: "success", message: "Imagen publicada." };
   } catch (error) {
     if (error instanceof ImageRejectedError) return { status: "error", message: error.message };
@@ -98,7 +98,7 @@ export async function setPrimaryImage(imageId: string): Promise<ActionState> {
     .eq("id", image.id);
   if (error) return { status: "error", message: "No se pudo cambiar la foto principal." };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success" };
 }
 
@@ -128,7 +128,7 @@ export async function moveImage(imageId: string, direction: "up" | "down"): Prom
     ),
   );
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success" };
 }
 
@@ -143,7 +143,7 @@ export async function updateImageAlt(imageId: string, altText: string): Promise<
     .update({ alt_text: alt.data })
     .eq("id", image.id);
   if (error) return { status: "error", message: "No se pudo guardar la descripción." };
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Descripción guardada." };
 }
 
@@ -167,6 +167,6 @@ export async function deleteImage(imageId: string): Promise<ActionState> {
     if (next) await supabase.from("product_images").update({ is_primary: true }).eq("id", next.id);
   }
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success" };
 }

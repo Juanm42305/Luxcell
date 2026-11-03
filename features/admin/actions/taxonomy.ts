@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { brandSchema, categorySchema, formToObject, toFieldErrors } from "@/schemas/admin";
 import { requireAdmin } from "@/services/admin-session";
+import { invalidateCatalog } from "../invalidate";
 import { type ActionState, databaseErrorMessage } from "../action-state";
 
 const invalid = (error: z.ZodError): ActionState => ({
@@ -37,7 +37,7 @@ export async function saveCategory(
     : await supabase.from("categories").insert(row);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: id ? "Categoría guardada." : "Categoría creada." };
 }
 
@@ -46,7 +46,7 @@ export async function deleteCategory(id: string): Promise<ActionState> {
   if (!z.uuid().safeParse(id).success) return { status: "error", message: "Categoría no válida." };
   const { error } = await supabase.from("categories").delete().eq("id", id);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Categoría eliminada." };
 }
 
@@ -68,7 +68,7 @@ export async function saveBrand(
     : await supabase.from("brands").insert(row);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
 
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: id ? "Marca guardada." : "Marca creada." };
 }
 
@@ -77,6 +77,6 @@ export async function deleteBrand(id: string): Promise<ActionState> {
   if (!z.uuid().safeParse(id).success) return { status: "error", message: "Marca no válida." };
   const { error } = await supabase.from("brands").delete().eq("id", id);
   if (error) return { status: "error", message: databaseErrorMessage(error.code) };
-  revalidatePath("/", "layout");
+  invalidateCatalog();
   return { status: "success", message: "Marca eliminada." };
 }

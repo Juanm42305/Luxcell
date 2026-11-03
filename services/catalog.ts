@@ -1,5 +1,7 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { z } from "zod";
+import { CATALOG_CACHE, CATALOG_TAG } from "@/lib/cache-tags";
 import { toSearchPattern } from "@/lib/search";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { CatalogFilters } from "@/schemas/catalog-filters";
@@ -78,7 +80,7 @@ async function withImages(rows: CatalogRow[]): Promise<PublicProduct[]> {
   return rows.map((row) => toPublicProduct(row, byProduct.get(row.id!) ?? []));
 }
 
-export async function listProducts(filters: CatalogFilters): Promise<PublicProduct[]> {
+async function fetchProducts(filters: CatalogFilters): Promise<PublicProduct[]> {
   const supabase = createPublicClient();
   let query = supabase.from("catalog_products").select("*").limit(MAX_LISTED_PRODUCTS);
 
@@ -99,7 +101,7 @@ export async function listProducts(filters: CatalogFilters): Promise<PublicProdu
   return withImages(data);
 }
 
-export async function getFeaturedProducts(limit = 4): Promise<PublicProduct[]> {
+async function fetchFeaturedProducts(limit = 4): Promise<PublicProduct[]> {
   const { data, error } = await createPublicClient()
     .from("catalog_products")
     .select("*")
@@ -110,7 +112,7 @@ export async function getFeaturedProducts(limit = 4): Promise<PublicProduct[]> {
   return withImages(data);
 }
 
-export async function getLatestProducts(limit = 6): Promise<PublicProduct[]> {
+async function fetchLatestProducts(limit = 6): Promise<PublicProduct[]> {
   const { data, error } = await createPublicClient()
     .from("catalog_products")
     .select("*")
@@ -120,7 +122,7 @@ export async function getLatestProducts(limit = 6): Promise<PublicProduct[]> {
   return withImages(data);
 }
 
-export async function getAvailableProducts(limit = 8): Promise<PublicProduct[]> {
+async function fetchAvailableProducts(limit = 8): Promise<PublicProduct[]> {
   const { data, error } = await createPublicClient()
     .from("catalog_products")
     .select("*")
@@ -131,7 +133,7 @@ export async function getAvailableProducts(limit = 8): Promise<PublicProduct[]> 
   return withImages(data);
 }
 
-export async function getProductBySlug(slug: string): Promise<PublicProduct | null> {
+async function fetchProductBySlug(slug: string): Promise<PublicProduct | null> {
   const { data, error } = await createPublicClient()
     .from("catalog_products")
     .select("*")
@@ -143,22 +145,23 @@ export async function getProductBySlug(slug: string): Promise<PublicProduct | nu
   return product ?? null;
 }
 
-export async function getRelatedProducts(
-  product: PublicProduct,
-  limit = 4,
+async function fetchRelatedProducts(
+  categorySlug: string,
+  productId: string,
+  limit: number,
 ): Promise<PublicProduct[]> {
   const { data, error } = await createPublicClient()
     .from("catalog_products")
     .select("*")
-    .eq("category_slug", product.category.slug)
-    .neq("id", product.id)
+    .eq("category_slug", categorySlug)
+    .neq("id", productId)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) failWith("No se pudieron cargar los relacionados", error.code);
   return withImages(data);
 }
 
-export async function getCategories(): Promise<Category[]> {
+async function fetchCategories(): Promise<Category[]> {
   const { data, error } = await createPublicClient()
     .from("categories")
     .select("id, name, slug, description")
@@ -167,11 +170,52 @@ export async function getCategories(): Promise<Category[]> {
   return data;
 }
 
-export async function getBrands(): Promise<Brand[]> {
+async function fetchBrands(): Promise<Brand[]> {
   const { data, error } = await createPublicClient()
     .from("brands")
     .select("id, name, slug")
     .order("name");
   if (error) failWith("No se pudieron cargar las marcas", error.code);
   return data;
+}
+
+/*
+ * Lecturas públicas en caché compartida. Se renuevan solas cada pocos minutos y el panel las
+ * invalida al instante al guardar cualquier cambio (etiqueta CATALOG_TAG). Así la mayoría de
+ * visitas no consultan la base de datos.
+ */
+const cacheOptions = { tags: [CATALOG_TAG], revalidate: CATALOG_CACHE.revalidateSeconds };
+
+export const listProducts = unstable_cache(fetchProducts, ["catalogo:lista"], cacheOptions);
+export const getFeaturedProducts = unstable_cache(
+  fetchFeaturedProducts,
+  ["catalogo:destacados"],
+  cacheOptions,
+);
+export const getLatestProducts = unstable_cache(
+  fetchLatestProducts,
+  ["catalogo:novedades"],
+  cacheOptions,
+);
+export const getAvailableProducts = unstable_cache(
+  fetchAvailableProducts,
+  ["catalogo:disponibles"],
+  cacheOptions,
+);
+export const getProductBySlug = unstable_cache(
+  fetchProductBySlug,
+  ["catalogo:producto"],
+  cacheOptions,
+);
+export const getCategories = unstable_cache(fetchCategories, ["catalogo:categorias"], cacheOptions);
+export const getBrands = unstable_cache(fetchBrands, ["catalogo:marcas"], cacheOptions);
+
+const cachedRelatedProducts = unstable_cache(
+  fetchRelatedProducts,
+  ["catalogo:relacionados"],
+  cacheOptions,
+);
+
+export function getRelatedProducts(product: PublicProduct, limit = 4): Promise<PublicProduct[]> {
+  return cachedRelatedProducts(product.category.slug, product.id, limit);
 }
