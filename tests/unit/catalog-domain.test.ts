@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCop } from "@/lib/format";
+import { formatCop, formatPhone } from "@/lib/format";
 import { getStockStatus } from "@/lib/inventory";
 import { toSearchPattern } from "@/lib/search";
 import { toSlug } from "@/lib/slug";
@@ -27,6 +27,18 @@ describe("formatCop", () => {
   it("usa el formato colombiano", () => {
     expect(formatCop(2_500_000)).toBe("$2.500.000 COP");
     expect(formatCop(95_000)).toBe("$95.000 COP");
+  });
+});
+
+describe("formatPhone", () => {
+  it("muestra los celulares colombianos con +57", () => {
+    expect(formatPhone("573203164287")).toBe("+57 320 316 4287");
+    expect(formatPhone("3203164287")).toBe("+57 320 316 4287");
+    expect(formatPhone("+57 320 316 4287")).toBe("+57 320 316 4287");
+  });
+
+  it("deja igual cualquier otro formato", () => {
+    expect(formatPhone(" 604 123 4567 ")).toBe("604 123 4567");
   });
 });
 

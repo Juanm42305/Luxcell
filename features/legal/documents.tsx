@@ -38,18 +38,6 @@ function responsible(s: BusinessSettings) {
   return (
     <ul>
       <li>Nombre comercial: {s.name}</li>
-      <li>
-        Nombre o razón social del responsable:{" "}
-        {s.legalName ?? <Pending>nombre completo o razón social</Pending>}
-      </li>
-      <li>
-        Identificación:{" "}
-        {s.taxId ?? <Pending>NIT o número de identificación del responsable</Pending>}
-      </li>
-      <li>
-        Dirección de notificación:{" "}
-        {s.judicialAddress ?? <Pending>dirección de notificación del responsable</Pending>}
-      </li>
       <li>Teléfono: {s.phone ?? <Pending>teléfono</Pending>}</li>
       <li>Correo electrónico: {s.contactEmail ?? <Pending>correo de atención</Pending>}</li>
     </ul>
@@ -300,10 +288,10 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             heading: "3. Información de los productos",
             body: (
               <p>
-                Publicamos características, estado (nuevo, usado o reacondicionado), fotografías y
-                disponibilidad con base en la información real de cada producto. Si una imagen es
-                solo ilustrativa, lo indicamos. Antes de cerrar una compra te confirmamos por
-                WhatsApp las características del equipo que vas a recibir.
+                Publicamos características, estado (nuevo, exhibición, seminuevo o reacondicionado),
+                fotografías y disponibilidad con base en la información real de cada producto. Si
+                una imagen es solo ilustrativa, lo indicamos. Antes de cerrar una compra te
+                confirmamos por WhatsApp las características del equipo que vas a recibir.
               </p>
             ),
           },
@@ -312,8 +300,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             body: (
               <ul>
                 <li>
-                  Los precios están en pesos colombianos (COP) e incluyen los impuestos aplicables.{" "}
-                  <Pending>confirmación del negocio sobre impuestos incluidos</Pending>
+                  Los precios están en pesos colombianos (COP) e incluyen los impuestos aplicables.
                 </li>
                 <li>
                   El precio que se aplica es el publicado al momento de acordar la compra. Los
@@ -340,10 +327,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
                   entregar a tiempo o el producto no está disponible, puedes terminar la compra y te
                   devolveremos el dinero en máximo 15 días calendario.
                 </p>
-                <p>
-                  Medios de pago, cobertura y costos de envío:{" "}
-                  <Pending>condiciones comerciales del negocio</Pending>.
-                </p>
+                <p>Medios de pago: transferencia bancaria y efectivo.</p>
               </>
             ),
           },
@@ -387,13 +371,6 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
               <>
                 <p>Puedes presentarlos por estos canales:</p>
                 {contactChannels(s)}
-                <p>
-                  También puedes acudir a la{" "}
-                  <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer">
-                    Superintendencia de Industria y Comercio
-                  </a>
-                  .
-                </p>
               </>
             ),
           },
@@ -481,8 +458,8 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             heading: "Sitios externos",
             body: (
               <p>
-                Los enlaces a WhatsApp, Instagram o la Superintendencia de Industria y Comercio te
-                llevan a sitios de terceros, que aplican sus propias políticas de cookies.
+                Los enlaces a WhatsApp o Instagram te llevan a sitios de terceros, que aplican sus
+                propias políticas de cookies.
               </p>
             ),
           },

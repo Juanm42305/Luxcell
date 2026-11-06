@@ -82,7 +82,7 @@ await fetch(`${api}/rest/v1/admin_profiles`, {
 
 const browser = await chromium.launch({ channel: "msedge" });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-await ctx.addInitScript(() => localStorage.setItem("luxcell-aceptacion-legal", "2026-11-02"));
+await ctx.addInitScript(() => localStorage.setItem("luxcell-aceptacion-legal", "2026-11-06"));
 const page = await ctx.newPage();
 const consoleErrors = [];
 page.on("console", (m) => m.type() === "error" && consoleErrors.push(m.text()));

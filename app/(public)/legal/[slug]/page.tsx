@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
-import { LEGAL_VERSION } from "@/features/legal/acceptance";
 import { getLegalDocument } from "@/features/legal/documents";
 import { getBusinessSettings } from "@/services/settings";
 
@@ -19,8 +18,7 @@ export default async function LegalPage({ params }: LegalPageProps) {
   return (
     <Container className="py-12 sm:py-16">
       <article className="max-w-3xl">
-        <p className="text-sm font-medium text-brand-ink">Versión {LEGAL_VERSION}</p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+        <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
           {document.title}
         </h1>
         <div className="legal-text mt-6 space-y-4 text-ink-soft">{document.intro}</div>

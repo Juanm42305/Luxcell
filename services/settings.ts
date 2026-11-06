@@ -2,6 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { CATALOG_CACHE, CATALOG_TAG } from "@/lib/cache-tags";
+import { formatPhone } from "@/lib/format";
 import { fallbackBusinessName } from "@/config/site";
 import { createPublicClient } from "@/lib/supabase/public";
 import { parseBrandColor, parseSocialLinks } from "@/schemas/business-settings";
@@ -43,7 +44,7 @@ export const getBusinessSettings = cache(async () => {
       : null,
     whatsappNumber: data?.whatsapp_number ?? null,
     contactEmail: data?.contact_email ?? null,
-    phone: data?.phone ?? null,
+    phone: data?.phone ? formatPhone(data.phone) : null,
     commercialAddress: data?.business_address ?? null,
     legalName: data?.legal_name ?? null,
     taxId: data?.tax_id ?? null,
