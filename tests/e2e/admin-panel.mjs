@@ -25,8 +25,11 @@ const check = (name, ok, extra = "") => {
 function totp(base32) {
   const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
   let bits = "";
-  for (const c of base32.replace(/=+$/, "")) bits += alpha.indexOf(c).toString(2).padStart(5, "0");
-  const key = Buffer.from(bits.match(/.{8}/g).map((b) => parseInt(b, 2)));
+  for (const c of base32) {
+    if (c === "=") break; // el relleno solo va al final
+    bits += alpha.indexOf(c).toString(2).padStart(5, "0");
+  }
+  const key = Buffer.from(bits.match(/.{8}/g).map((b) => Number.parseInt(b, 2)));
   const counter = Buffer.alloc(8);
   counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
   const h = crypto.createHmac("sha1", key).update(counter).digest();

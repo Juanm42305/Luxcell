@@ -25,8 +25,11 @@ const check = (name, ok, extra = "") => {
 function totp(base32) {
   const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
   let bits = "";
-  for (const c of base32.replace(/=+$/, "")) bits += alpha.indexOf(c).toString(2).padStart(5, "0");
-  const key = Buffer.from(bits.match(/.{8}/g).map((b) => parseInt(b, 2)));
+  for (const c of base32) {
+    if (c === "=") break; // el relleno solo va al final
+    bits += alpha.indexOf(c).toString(2).padStart(5, "0");
+  }
+  const key = Buffer.from(bits.match(/.{8}/g).map((b) => Number.parseInt(b, 2)));
   const counter = Buffer.alloc(8);
   counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
   const h = crypto.createHmac("sha1", key).update(counter).digest();
@@ -35,11 +38,18 @@ function totp(base32) {
 }
 
 const headers = { apikey: pub, Authorization: `Bearer ${pub}` };
-const rest = (path, init = {}) =>
-  fetch(`${api}/rest/v1/${path}`, {
+// Solo se aceptan rutas relativas de PostgREST y el destino queda fijo en la API local.
+const apiOrigin = new URL(api).origin;
+const rest = (path, init = {}) => {
+  if (!/^[\w/]+(\?[\w.,=&*:-]*)?$/.test(path)) throw new Error("Ruta de API no permitida");
+  const url = new URL(`/rest/v1/${path}`, apiOrigin);
+  if (url.origin !== apiOrigin) throw new Error("Destino de API no permitido");
+  return fetch(url, {
     ...init,
     headers: { ...headers, "Content-Type": "application/json", ...init.headers },
   });
+};
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 console.log("\n== Ataques a la API con la clave pública ==");
 for (const t of [
@@ -68,7 +78,10 @@ r = await rest("catalog_products?id=not.is.null", {
   method: "PATCH",
   body: JSON.stringify({ price: 1 }),
 });
-const after = await (await rest("catalog_products?select=price&id=eq." + row.id)).json();
+if (!UUID.test(String(row.id))) throw new Error("Identificador de producto inesperado");
+const after = await (
+  await rest(`catalog_products?select=price&id=eq.${encodeURIComponent(row.id)}`)
+).json();
 check(
   "escribir por la vista no tiene efecto",
   r.status >= 400 && after[0].price === row.price,
