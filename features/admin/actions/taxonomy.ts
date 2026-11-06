@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { toExactPattern } from "@/lib/search";
 import { brandSchema, categorySchema, formToObject, toFieldErrors } from "@/schemas/admin";
 import { requireAdmin } from "@/services/admin-session";
 import { invalidateCatalog } from "../invalidate";
@@ -10,6 +11,30 @@ const invalid = (error: z.ZodError): ActionState => ({
   status: "error",
   message: "Revisa los campos marcados.",
   fieldErrors: toFieldErrors(error),
+});
+
+type AdminClient = Awaited<ReturnType<typeof requireAdmin>>["supabase"];
+
+/**
+ * La base de datos ya impide repetir el identificador; esto impide además «Apple» y «APPLE»,
+ * que tendrían identificadores distintos si se edita el slug a mano.
+ */
+async function nameTaken(
+  supabase: AdminClient,
+  table: "brands" | "categories",
+  name: string,
+  exceptId: string | null,
+): Promise<boolean> {
+  let query = supabase.from(table).select("id").ilike("name", toExactPattern(name)).limit(1);
+  if (exceptId) query = query.neq("id", exceptId);
+  const { data } = await query;
+  return Boolean(data && data.length > 0);
+}
+
+const duplicated = (label: string, name: string): ActionState => ({
+  status: "error",
+  message: `Ya existe ${label} «${name}».`,
+  fieldErrors: { name: "Este nombre ya existe." },
 });
 
 /** `id` vacío crea una categoría nueva; con valor, la actualiza. */
@@ -24,6 +49,8 @@ export async function saveCategory(
 
   const parsed = categorySchema.safeParse(formToObject(formData));
   if (!parsed.success) return invalid(parsed.error);
+  if (await nameTaken(supabase, "categories", parsed.data.name, id))
+    return duplicated("una categoría llamada", parsed.data.name);
 
   const row = {
     name: parsed.data.name,
@@ -61,6 +88,8 @@ export async function saveBrand(
 
   const parsed = brandSchema.safeParse(formToObject(formData));
   if (!parsed.success) return invalid(parsed.error);
+  if (await nameTaken(supabase, "brands", parsed.data.name, id))
+    return duplicated("una marca llamada", parsed.data.name);
 
   const row = { name: parsed.data.name, slug: parsed.data.slug, is_active: parsed.data.isActive };
   const { error } = id

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatCop, formatPhone } from "@/lib/format";
 import { getStockStatus } from "@/lib/inventory";
-import { toSearchPattern } from "@/lib/search";
+import { toExactPattern, toSearchPattern } from "@/lib/search";
 import { toSlug } from "@/lib/slug";
 import { buildProductMessage, buildWhatsAppUrl, getProductContact } from "@/lib/whatsapp";
 import { parseBrandColor, parseSocialLinks } from "@/schemas/business-settings";
@@ -86,6 +86,13 @@ describe("filtros del catálogo", () => {
       max: undefined,
       marca: undefined,
     });
+  });
+});
+
+describe("toExactPattern", () => {
+  it("compara el texto exacto, sin comodines", () => {
+    expect(toExactPattern("Apple")).toBe("Apple");
+    expect(toExactPattern("100%_real\\")).toBe("100\\%\\_real\\\\");
   });
 });
 

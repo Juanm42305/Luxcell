@@ -111,6 +111,15 @@ await page.fill("#nuevo-name", brandName);
 await page.getByRole("button", { name: "Crear" }).click();
 await page.waitForSelector("text=Marca creada.");
 check("crear marca", true);
+check(
+  "tras crear, el formulario queda vacío para otra marca",
+  (await page.inputValue("#nuevo-name")) === "" && (await page.inputValue("#nuevo-slug")) === "",
+);
+await page.fill("#nuevo-name", brandName.toUpperCase());
+await page.fill("#nuevo-slug", `otra-${Date.now()}`);
+await page.getByRole("button", { name: "Crear" }).click();
+await page.waitForSelector("text=Ya existe una marca llamada");
+check("no deja crear la misma marca con otras mayúsculas", true);
 
 // Producto con intento de XSS en el nombre
 const xssName = `Equipo <img src=x onerror="window.__xss=1"> ${Date.now()}`;

@@ -29,12 +29,23 @@ export function TaxonomyEditor({ item, kind, save, remove }: TaxonomyEditorProps
   const { state, onSubmit, isPending } = useFormAction(save);
   const [slug, setSlug] = useState(item?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(item));
+  // Al crear con éxito, el formulario se vuelve a montar vacío para agregar otra.
+  const [formKey, setFormKey] = useState(0);
+  const [handledState, setHandledState] = useState(state);
+  if (state !== handledState) {
+    setHandledState(state);
+    if (!item && state.status === "success") {
+      setSlug("");
+      setSlugTouched(false);
+      setFormKey((key) => key + 1);
+    }
+  }
   const errors = state.fieldErrors ?? {};
   const prefix = item?.id ?? "nuevo";
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4">
-      <form onSubmit={onSubmit} className="space-y-3">
+      <form key={formKey} onSubmit={onSubmit} className="space-y-3">
         <FormStatus state={state} />
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
@@ -47,6 +58,8 @@ export function TaxonomyEditor({ item, kind, save, remove }: TaxonomyEditorProps
               required
               maxLength={80}
               defaultValue={item?.name}
+              autoFocus={formKey > 0}
+              aria-invalid={Boolean(errors.name)}
               onChange={(event) => {
                 if (!slugTouched) setSlug(toSlug(event.target.value));
               }}
