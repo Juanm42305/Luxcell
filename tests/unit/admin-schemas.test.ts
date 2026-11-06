@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import {
   brandSchema,
   categorySchema,
@@ -160,6 +161,15 @@ describe("utilidades de formularios", () => {
       expect(errors.name).toBe("El nombre es obligatorio.");
       expect(errors.slug).toBe("El identificador es obligatorio.");
     }
+  });
+
+  it("toFieldErrors agrupa los errores sin campo bajo 'form'", () => {
+    const result = z
+      .object({ a: z.string() })
+      .refine(() => false, "Error general")
+      .safeParse({ a: "x" });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(toFieldErrors(result.error)).toEqual({ form: "Error general" });
   });
 
   it("formToObject ignora archivos y campos internos de React", () => {

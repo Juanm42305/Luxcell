@@ -48,6 +48,14 @@ describe("WhatsApp", () => {
     expect(contact.label).toBe("Preguntar por reposición");
     expect(contact.message).toContain("agotado");
   });
+
+  it("con existencias invita a consultar el producto", () => {
+    for (const status of ["available", "low_stock"] as const) {
+      const contact = getProductContact(product, status);
+      expect(contact.label).toBe("Consultar por WhatsApp");
+      expect(contact.message).toContain("interesado");
+    }
+  });
 });
 
 describe("filtros del catálogo", () => {

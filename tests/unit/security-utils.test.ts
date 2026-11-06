@@ -55,6 +55,15 @@ describe("processImage", () => {
     );
     const tiny = await solid(50, 50).png().toBuffer();
     await expect(processImage(toArrayBuffer(tiny), limits)).rejects.toThrow("píxeles");
+    // Una imagen gigantesca se rechaza antes de procesarla (evita agotar la memoria).
+    const huge = await solid(8001, 200).png().toBuffer();
+    await expect(processImage(toArrayBuffer(huge), limits)).rejects.toThrow("píxeles");
+  });
+
+  it("rechaza archivos de más de 15 MB sin leerlos", async () => {
+    const big = new Uint8Array(15 * 1024 * 1024 + 1);
+    big.set([0xff, 0xd8, 0xff]);
+    await expect(processImage(big.buffer, limits)).rejects.toThrow("15 MB");
   });
 });
 
