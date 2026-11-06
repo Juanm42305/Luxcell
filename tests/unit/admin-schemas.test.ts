@@ -6,7 +6,6 @@ import {
   formToObject,
   newProductSchema,
   productSchema,
-  settingsSchema,
   stockSchema,
   toFieldErrors,
   uploadPathSchema,
@@ -27,7 +26,8 @@ const validProduct = {
   lowStockThreshold: "3",
   condition: "new",
   storageCapacity: "128 GB",
-  color: "",
+  colors: "",
+  salePrice: "",
   specs: "Pantalla: 6,1 pulgadas\nHora: 10:30",
   warrantyTerms: "",
   offerValidUntil: "",
@@ -38,7 +38,8 @@ describe("productSchema", () => {
   it("acepta un producto válido y normaliza los valores", () => {
     const result = productSchema.parse(validProduct);
     expect(result.price).toBe(2_500_000);
-    expect(result.color).toBeNull();
+    expect(result.colors).toEqual([]);
+    expect(result.salePrice).toBeNull();
     expect(result.offerValidUntil).toBeNull();
     expect(result.isFeatured).toBe(true);
     expect(result.isActive).toBe(false);
@@ -64,12 +65,57 @@ describe("productSchema", () => {
   });
 
   it("valida la fecha de la oferta", () => {
+    const offer = { ...validProduct, salePrice: "2.300.000" };
+    expect(productSchema.parse({ ...offer, offerValidUntil: "2026-12-31" }).offerValidUntil).toBe(
+      "2026-12-31",
+    );
+    expect(productSchema.safeParse({ ...offer, offerValidUntil: "31/12/2026" }).success).toBe(
+      false,
+    );
+  });
+
+  it("acepta un precio en oferta menor que el normal", () => {
+    expect(productSchema.parse({ ...validProduct, salePrice: "$2.300.000" }).salePrice).toBe(
+      2_300_000,
+    );
+  });
+
+  it("rechaza ofertas iguales o mayores al precio, y fechas sin precio en oferta", () => {
+    for (const salePrice of ["2500000", "2600000", "-1"]) {
+      const result = productSchema.safeParse({ ...validProduct, salePrice });
+      expect(result.success).toBe(false);
+      if (!result.success) expect(toFieldErrors(result.error).salePrice).toBeDefined();
+    }
+    const noPrice = productSchema.safeParse({ ...validProduct, offerValidUntil: "2026-12-31" });
+    expect(noPrice.success).toBe(false);
+    if (!noPrice.success) expect(toFieldErrors(noPrice.error).salePrice).toBeDefined();
     expect(
-      productSchema.parse({ ...validProduct, offerValidUntil: "2026-12-31" }).offerValidUntil,
-    ).toBe("2026-12-31");
-    expect(
-      productSchema.safeParse({ ...validProduct, offerValidUntil: "31/12/2026" }).success,
+      newProductSchema.safeParse({ ...validProduct, initialStock: "1", salePrice: "3000000" })
+        .success,
     ).toBe(false);
+  });
+
+  it("convierte los colores en lista, sin vacíos ni repetidos", () => {
+    const result = productSchema.parse({
+      ...validProduct,
+      colors: " Negro \n\nblanco\nNEGRO\nTitanio   natural",
+    });
+    expect(result.colors).toEqual(["Negro", "blanco", "Titanio natural"]);
+  });
+
+  it("limita la cantidad y el largo de los colores", () => {
+    const many = Array.from({ length: 13 }, (_, i) => `Color ${i}`).join("\n");
+    expect(productSchema.safeParse({ ...validProduct, colors: many }).success).toBe(false);
+    expect(productSchema.safeParse({ ...validProduct, colors: "x".repeat(41) }).success).toBe(
+      false,
+    );
+  });
+
+  it("solo acepta los cuatro estados del producto", () => {
+    for (const condition of ["new", "display", "like_new", "refurbished"]) {
+      expect(productSchema.safeParse({ ...validProduct, condition }).success).toBe(true);
+    }
+    expect(productSchema.safeParse({ ...validProduct, condition: "used" }).success).toBe(false);
   });
 
   it("exige existencias iniciales al crear", () => {
@@ -100,55 +146,6 @@ describe("esquemas de inventario y taxonomía", () => {
     expect(uploadPathSchema.safeParse(`${uuid}.webp`).success).toBe(true);
     expect(uploadPathSchema.safeParse("../../etc/passwd").success).toBe(false);
     expect(uploadPathSchema.safeParse(`${uuid}.php`).success).toBe(false);
-  });
-});
-
-describe("settingsSchema", () => {
-  const settings = {
-    businessName: "Tienda",
-    slogan: "",
-    description: "",
-    whatsappNumber: "573001234567",
-    contactEmail: "ventas@example.com",
-    phone: "",
-    businessAddress: "",
-    legalName: "",
-    taxId: "",
-    judicialAddress: "",
-    salesAuthorization: "",
-    socialLinks: "Instagram | https://www.instagram.com/tienda/",
-    brandColor: "#ffdc08",
-  };
-
-  it("acepta una configuración válida", () => {
-    const result = settingsSchema.parse(settings);
-    expect(result.socialLinks).toEqual([
-      { label: "Instagram", href: "https://www.instagram.com/tienda/" },
-    ]);
-    expect(result.slogan).toBeNull();
-  });
-
-  it("vacía los campos opcionales", () => {
-    const result = settingsSchema.parse({ ...settings, whatsappNumber: "", contactEmail: "" });
-    expect(result.whatsappNumber).toBeNull();
-    expect(result.contactEmail).toBeNull();
-  });
-
-  it("rechaza enlaces sin https, javascript: y datos mal escritos", () => {
-    for (const socialLinks of [
-      "Web | http://example.com",
-      "Web | javascript:alert(1)",
-      "solo texto",
-    ]) {
-      expect(settingsSchema.safeParse({ ...settings, socialLinks }).success).toBe(false);
-    }
-    expect(settingsSchema.safeParse({ ...settings, whatsappNumber: "+57 300" }).success).toBe(
-      false,
-    );
-    expect(settingsSchema.safeParse({ ...settings, contactEmail: "no-es-correo" }).success).toBe(
-      false,
-    );
-    expect(settingsSchema.safeParse({ ...settings, brandColor: "red" }).success).toBe(false);
   });
 });
 

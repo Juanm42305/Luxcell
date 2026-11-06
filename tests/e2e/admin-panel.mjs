@@ -125,6 +125,25 @@ await page.fill("#shortDescription", "Descripción breve de prueba.");
 await page.fill("#description", "Descripción completa de prueba.");
 await page.fill("#specs", "Pantalla: 6,1 pulgadas\nBatería: prueba");
 await page.fill("#price", "2.500.000");
+await page.selectOption("#condition", "display");
+check(
+  "el estado ofrece solo Nuevo, Exhibición, Seminuevo y Reacondicionado",
+  JSON.stringify(await page.locator("#condition option").allTextContents()) ===
+    JSON.stringify(["Nuevo", "Exhibición", "Seminuevo", "Reacondicionado"]),
+);
+await page
+  .getByRole("group", { name: "Colores sugeridos" })
+  .getByRole("button", { name: "Agregar Negro", exact: true })
+  .click();
+await page.getByPlaceholder("Escribe un color y pulsa Enter").fill("Azul pacífico");
+await page.keyboard.press("Enter");
+await page
+  .getByRole("group", { name: "Colores sugeridos" })
+  .getByRole("button", { name: "Agregar Blanco", exact: true })
+  .click();
+await page.getByRole("button", { name: "Quitar Blanco" }).click();
+await page.fill("#salePrice", "2.600.000");
+await page.fill("#offerValidUntil", "2099-12-31");
 await page.fill("#initialStock", "-5");
 await page.check('input[name="isActive"]');
 await page.getByRole("button", { name: "Crear producto" }).click();
@@ -133,6 +152,11 @@ check(
   "existencias negativas rechazadas",
   (await page.textContent("#initialStock-error")).includes("negativ"),
 );
+check(
+  "precio en oferta mayor que el normal rechazado",
+  (await page.textContent("#salePrice-error")).includes("menor"),
+);
+await page.fill("#salePrice", "2.300.000");
 await page.fill("#initialStock", "4");
 await page.getByRole("button", { name: "Crear producto" }).click();
 await page.waitForURL(
@@ -228,19 +252,17 @@ check(
     (await pub2.textContent("h1")).includes("<img"),
 );
 check("precio con formato colombiano", (await pub2.textContent("main")).includes("$2.500.000 COP"));
-await pub2.close();
-
-// Configuración con valores maliciosos
-await page.goto(app + ADMIN + "/configuracion");
-await page.fill("#whatsappNumber", "+57 300 abc");
-await page.fill("#socialLinks", "Malo | javascript:alert(1)");
-await page.getByRole("button", { name: "Guardar configuración" }).click();
-await page.waitForSelector("#whatsappNumber-error");
-check("número de WhatsApp mal formado rechazado", true);
+const publicText = await pub2.textContent("main");
+check("la web muestra el estado Exhibición", publicText.includes("Exhibición"));
+check("la web muestra los colores elegidos", publicText.includes("Negro, Azul pacífico"));
 check(
-  "enlace javascript: rechazado",
-  (await page.textContent("#socialLinks-error")).includes("https"),
+  "la web muestra la oferta con descuento y contador",
+  publicText.includes("$2.300.000 COP") &&
+    publicText.includes("−8 %") &&
+    /Termina en \d+ d \d{2}:\d{2}:\d{2}/.test(publicText),
+  publicText.slice(0, 200),
 );
+await pub2.close();
 
 // Eliminar producto: también borra el archivo
 await page.goto(productUrl);

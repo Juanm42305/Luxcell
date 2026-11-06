@@ -38,10 +38,12 @@ function toPublicProduct(row: CatalogRow, images: ProductImage[]): PublicProduct
     shortDescription: row.short_description!,
     description: row.description!,
     priceCop: row.price!,
+    salePriceCop: row.sale_price,
+    offerValidUntil: row.offer_valid_until,
     stockStatus: row.stock_status as StockStatus,
     condition: row.condition!,
     storageCapacity: row.storage_capacity,
-    color: row.color,
+    colors: row.colors ?? [],
     specs: specs.success ? specs.data : [],
     warrantyTerms: row.warranty_terms,
     isFeatured: row.is_featured!,
@@ -87,14 +89,15 @@ async function fetchProducts(filters: CatalogFilters): Promise<PublicProduct[]> 
   if (filters.q) query = query.ilike("search_text", toSearchPattern(filters.q));
   if (filters.categoria) query = query.eq("category_slug", filters.categoria);
   if (filters.marca) query = query.eq("brand_slug", filters.marca);
-  if (filters.min !== undefined) query = query.gte("price", filters.min);
-  if (filters.max !== undefined) query = query.lte("price", filters.max);
+  // Filtra y ordena por lo que el cliente paga hoy: el precio en oferta si la hay.
+  if (filters.min !== undefined) query = query.gte("effective_price", filters.min);
+  if (filters.max !== undefined) query = query.lte("effective_price", filters.max);
   if (filters.disponibilidad) query = query.eq("stock_status", filters.disponibilidad);
 
   query =
     filters.orden === "novedades"
       ? query.order("created_at", { ascending: false })
-      : query.order("price", { ascending: filters.orden === "precio-asc" });
+      : query.order("effective_price", { ascending: filters.orden === "precio-asc" });
 
   const { data, error } = await query;
   if (error) failWith("No se pudo cargar el catálogo", error.code);

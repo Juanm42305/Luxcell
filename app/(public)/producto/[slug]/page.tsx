@@ -8,17 +8,12 @@ import { ProductGallery } from "@/features/catalog/components/product-gallery";
 import { ProductRail } from "@/features/catalog/components/product-rail";
 import { StockBadge } from "@/features/catalog/components/stock-badge";
 import { WhatsAppLink } from "@/features/inquiries/components/whatsapp-link";
-import { formatCop, formatDate } from "@/lib/format";
+import { OfferBadge, ProductPrice } from "@/features/catalog/components/product-price";
+import { formatDate } from "@/lib/format";
+import { conditionLabels } from "@/lib/product-labels";
 import { getProductContact } from "@/lib/whatsapp";
 import { getProductBySlug, getRelatedProducts } from "@/services/catalog";
 import { getBusinessSettings } from "@/services/settings";
-import type { ProductCondition } from "@/types/catalog";
-
-const conditionLabels: Record<ProductCondition, string> = {
-  new: "Nuevo",
-  used: "Usado",
-  refurbished: "Reacondicionado",
-};
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
@@ -44,7 +39,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     { label: "Modelo", value: product.model },
     { label: "Estado", value: conditionLabels[product.condition] },
     { label: "Almacenamiento", value: product.storageCapacity },
-    { label: "Color", value: product.color },
+    {
+      label: product.colors.length > 1 ? "Colores disponibles" : "Color",
+      value: product.colors.join(", "),
+    },
   ].filter((detail): detail is { label: string; value: string } => Boolean(detail.value));
 
   return (
@@ -82,12 +80,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h1 className="mt-1 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
               {product.name}
             </h1>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <p className="text-2xl font-semibold tracking-tight tabular-nums">
-                {formatCop(product.priceCop)}
-              </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               <StockBadge status={product.stockStatus} />
+              <OfferBadge
+                priceCop={product.priceCop}
+                salePriceCop={product.salePriceCop}
+                offerValidUntil={product.offerValidUntil}
+              />
             </div>
+            <ProductPrice
+              size="page"
+              priceCop={product.priceCop}
+              salePriceCop={product.salePriceCop}
+              offerValidUntil={product.offerValidUntil}
+              className="mt-3"
+            />
             <p className="mt-5 text-ink-soft">{product.description}</p>
 
             <div className="mt-6">

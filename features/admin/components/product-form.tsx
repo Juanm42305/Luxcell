@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/button";
+import { conditionOptions } from "@/lib/product-labels";
 import { toSlug } from "@/lib/slug";
 import type { ActionState } from "../action-state";
 import { useFormAction } from "../use-form-action";
+import { ColorPicker } from "./color-picker";
 import { CheckboxField, FormStatus, inputClass, SelectField, TextArea, TextField } from "./fields";
 
 type Option = { value: string; label: string };
@@ -18,10 +20,11 @@ export type ProductFormValues = {
   short_description: string;
   description: string;
   price: number;
+  sale_price: number | null;
   low_stock_threshold: number;
   condition: string;
   storage_capacity: string | null;
-  color: string | null;
+  colors: string[];
   specs: { label: string; value: string }[];
   warranty_terms: string | null;
   offer_valid_until: string | null;
@@ -35,12 +38,6 @@ type ProductFormProps = {
   categories: Option[];
   initial?: ProductFormValues;
 };
-
-const conditionOptions = [
-  { value: "new", label: "Nuevo" },
-  { value: "used", label: "Usado" },
-  { value: "refurbished", label: "Reacondicionado" },
-];
 
 export function ProductForm({ action, brands, categories, initial }: ProductFormProps) {
   const { state, onSubmit, isPending } = useFormAction(action);
@@ -140,13 +137,7 @@ export function ProductForm({ action, brands, categories, initial }: ProductForm
           error={errors.storageCapacity}
           hint="Ej. 128 GB"
         />
-        <TextField
-          name="color"
-          label="Color (opcional)"
-          maxLength={60}
-          defaultValue={initial?.color}
-          error={errors.color}
-        />
+        <ColorPicker name="colors" defaultValue={initial?.colors} error={errors.colors} />
         <TextArea
           className="sm:col-span-2"
           name="shortDescription"
@@ -199,11 +190,20 @@ export function ProductForm({ action, brands, categories, initial }: ProductForm
           hint="Solo números. Ej. 2500000"
         />
         <TextField
+          name="salePrice"
+          label="Precio en oferta (opcional)"
+          inputMode="numeric"
+          defaultValue={initial?.sale_price}
+          error={errors.salePrice}
+          hint="Menor que el precio normal. La web tacha el precio normal y muestra el descuento."
+        />
+        <TextField
           name="offerValidUntil"
           label="Oferta válida hasta (opcional)"
           type="date"
           defaultValue={initial?.offer_valid_until}
           error={errors.offerValidUntil}
+          hint="Último día de la oferta. Muestra un contador y la oferta se quita sola al terminar."
         />
         {isNew && (
           <TextField

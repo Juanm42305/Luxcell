@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { WhatsAppLink } from "@/features/inquiries/components/whatsapp-link";
 import { cn } from "@/lib/cn";
-import { formatCop } from "@/lib/format";
 import { getProductContact } from "@/lib/whatsapp";
 import { getBusinessSettings } from "@/services/settings";
 import type { PublicProduct } from "@/types/catalog";
 import { ProductPhoto } from "./product-photo";
+import { OfferBadge, ProductPrice } from "./product-price";
 import { StockBadge } from "./stock-badge";
 
 export async function ProductCard({
@@ -40,6 +40,12 @@ export async function ProductCard({
           status={product.stockStatus}
           className="absolute top-2 left-2 sm:top-3 sm:left-3"
         />
+        <OfferBadge
+          priceCop={product.priceCop}
+          salePriceCop={product.salePriceCop}
+          offerValidUntil={product.offerValidUntil}
+          className="absolute top-2 right-2 sm:top-3 sm:right-3"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-5">
@@ -54,9 +60,19 @@ export async function ProductCard({
         <p className="mt-1.5 line-clamp-2 text-xs text-muted sm:text-sm">
           {product.shortDescription}
         </p>
-        <p className="mt-3 pb-3 text-[15px] font-semibold sm:pb-4 sm:text-lg tracking-tight tabular-nums">
-          {formatCop(product.priceCop)}
-        </p>
+        {product.colors.length > 0 && (
+          <p className="mt-1.5 truncate text-xs text-muted">
+            {product.colors.length === 1
+              ? product.colors[0]
+              : `Disponible en ${product.colors.length} colores`}
+          </p>
+        )}
+        <ProductPrice
+          priceCop={product.priceCop}
+          salePriceCop={product.salePriceCop}
+          offerValidUntil={product.offerValidUntil}
+          className="mt-3 pb-3 sm:pb-4"
+        />
 
         <div className="mt-auto flex flex-col gap-2">
           <WhatsAppLink

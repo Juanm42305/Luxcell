@@ -1,6 +1,6 @@
 export type StockStatus = "available" | "low_stock" | "out_of_stock";
 
-export type ProductCondition = "new" | "used" | "refurbished";
+export type ProductCondition = "new" | "display" | "like_new" | "refurbished";
 
 /** Ilustración de respaldo para productos que aún no tienen fotografía. */
 export type ProductArtKind = "phone" | "earbuds" | "charger" | "case" | "device";
@@ -39,10 +39,14 @@ export type PublicProduct = {
   shortDescription: string;
   description: string;
   priceCop: number;
+  /** Precio rebajado mientras la oferta esté vigente; null si no hay oferta. */
+  salePriceCop: number | null;
+  /** Último día de la oferta (AAAA-MM-DD). null si la oferta no tiene fecha de fin. */
+  offerValidUntil: string | null;
   stockStatus: StockStatus;
   condition: ProductCondition;
   storageCapacity: string | null;
-  color: string | null;
+  colors: string[];
   specs: { label: string; value: string }[];
   warrantyTerms: string | null;
   isFeatured: boolean;

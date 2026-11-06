@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderTree, LayoutDashboard, Package, Settings, Tags } from "lucide-react";
+import { FolderTree, LayoutDashboard, Package, Tags } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
@@ -10,7 +10,6 @@ const items = [
   { path: "/productos", label: "Productos", icon: Package },
   { path: "/categorias", label: "Categorías", icon: FolderTree },
   { path: "/marcas", label: "Marcas", icon: Tags },
-  { path: "/configuracion", label: "Configuración", icon: Settings },
 ];
 
 export function AdminNav({ adminBase }: { adminBase: string }) {

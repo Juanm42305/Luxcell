@@ -411,7 +411,7 @@ export type Database = {
         Row: {
           brand_id: string;
           category_id: string;
-          color: string | null;
+          colors: string[];
           condition: Database["public"]["Enums"]["product_condition"];
           created_at: string;
           description: string;
@@ -423,6 +423,7 @@ export type Database = {
           name: string;
           offer_valid_until: string | null;
           price: number;
+          sale_price: number | null;
           short_description: string;
           slug: string;
           specs: NonNullable<Json>;
@@ -436,7 +437,7 @@ export type Database = {
         Insert: {
           brand_id: string;
           category_id: string;
-          color?: string | null;
+          colors?: string[];
           condition?: Database["public"]["Enums"]["product_condition"];
           created_at?: string;
           description: string;
@@ -448,6 +449,7 @@ export type Database = {
           name: string;
           offer_valid_until?: string | null;
           price: number;
+          sale_price?: number | null;
           short_description: string;
           slug: string;
           specs?: NonNullable<Json>;
@@ -460,7 +462,7 @@ export type Database = {
         Update: {
           brand_id?: string;
           category_id?: string;
-          color?: string | null;
+          colors?: string[];
           condition?: Database["public"]["Enums"]["product_condition"];
           created_at?: string;
           description?: string;
@@ -472,6 +474,7 @@ export type Database = {
           name?: string;
           offer_valid_until?: string | null;
           price?: number;
+          sale_price?: number | null;
           short_description?: string;
           slug?: string;
           specs?: NonNullable<Json>;
@@ -549,16 +552,18 @@ export type Database = {
           category_id: string;
           category_name: string;
           category_slug: string;
-          color: string | null;
+          colors: string[];
           condition: Database["public"]["Enums"]["product_condition"];
           created_at: string;
           description: string;
+          effective_price: number;
           id: string;
           is_featured: boolean;
           model: string;
           name: string;
           offer_valid_until: string | null;
           price: number;
+          sale_price: number | null;
           search_text: string | null;
           short_description: string;
           slug: string;
@@ -584,7 +589,7 @@ export type Database = {
       inquiry_status: "new" | "in_progress" | "closed";
       pqr_status: "received" | "in_progress" | "resolved";
       pqr_type: "peticion" | "queja" | "reclamo" | "datos_personales";
-      product_condition: "new" | "used" | "refurbished";
+      product_condition: "new" | "display" | "like_new" | "refurbished";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -702,7 +707,7 @@ export const Constants = {
       inquiry_status: ["new", "in_progress", "closed"],
       pqr_status: ["received", "in_progress", "resolved"],
       pqr_type: ["peticion", "queja", "reclamo", "datos_personales"],
-      product_condition: ["new", "used", "refurbished"],
+      product_condition: ["new", "display", "like_new", "refurbished"],
     },
   },
 } as const;

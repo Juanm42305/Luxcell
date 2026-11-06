@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_COLOR_LENGTH, MAX_COLORS } from "@/lib/product-labels";
 import { SLUG_PATTERN } from "@/lib/slug";
 
 /*
@@ -73,7 +74,41 @@ const specs = z
     return parsed;
   });
 
-export const productSchema = z.object({
+/** Un color por línea. Se quitan los repetidos sin importar mayúsculas. */
+const colors = z
+  .string()
+  .max(2000)
+  .transform((value, context) => {
+    const unique = new Map<string, string>();
+    for (const line of value.split("\n")) {
+      const color = line.trim().replace(/\s+/g, " ");
+      const key = color.toLocaleLowerCase("es");
+      if (color && !unique.has(key)) unique.set(key, color);
+    }
+    const list = [...unique.values()];
+    if (list.length > MAX_COLORS) {
+      context.addIssue({ code: "custom", message: `Máximo ${MAX_COLORS} colores.` });
+      return z.NEVER;
+    }
+    if (list.some((color) => color.length > MAX_COLOR_LENGTH)) {
+      context.addIssue({
+        code: "custom",
+        message: `Cada color: máximo ${MAX_COLOR_LENGTH} caracteres.`,
+      });
+      return z.NEVER;
+    }
+    return list;
+  });
+
+const optionalPrice = (label: string) =>
+  z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    integerFrom(label, 1_000_000_000)
+      .optional()
+      .transform((value) => value ?? null),
+  );
+
+const productFields = z.object({
   name: text(150, "El nombre"),
   slug,
   model: text(100, "El modelo"),
@@ -83,9 +118,12 @@ export const productSchema = z.object({
   description: text(5000, "La descripción completa"),
   price: integerFrom("El precio", 1_000_000_000),
   lowStockThreshold: integerFrom("El umbral de pocas unidades", 1000),
-  condition: z.enum(["new", "used", "refurbished"], { message: "Elige el estado del producto." }),
+  salePrice: optionalPrice("El precio en oferta"),
+  condition: z.enum(["new", "display", "like_new", "refurbished"], {
+    message: "Elige el estado del producto.",
+  }),
   storageCapacity: optionalText(40),
-  color: optionalText(60),
+  colors,
   specs,
   warrantyTerms: optionalText(2000),
   offerValidUntil: z
@@ -97,9 +135,32 @@ export const productSchema = z.object({
   isActive: checkbox,
 });
 
-export const newProductSchema = productSchema.extend({
-  initialStock: integerFrom("Las existencias", 100_000),
-});
+/** La base de datos repite la primera regla; la segunda evita una fecha sin oferta. */
+function checkOffer(
+  input: { price: number; salePrice: number | null; offerValidUntil: string | null },
+  context: z.RefinementCtx,
+) {
+  if (input.salePrice !== null && input.salePrice >= input.price) {
+    context.addIssue({
+      code: "custom",
+      path: ["salePrice"],
+      message: "Debe ser menor que el precio normal.",
+    });
+  }
+  if (input.offerValidUntil !== null && input.salePrice === null) {
+    context.addIssue({
+      code: "custom",
+      path: ["salePrice"],
+      message: "Escribe el precio en oferta o borra la fecha de fin.",
+    });
+  }
+}
+
+export const productSchema = productFields.superRefine(checkOffer);
+
+export const newProductSchema = productFields
+  .extend({ initialStock: integerFrom("Las existencias", 100_000) })
+  .superRefine(checkOffer);
 
 export const stockSchema = z.object({
   quantity: integerFrom("Las existencias", 100_000),
@@ -118,71 +179,6 @@ export const brandSchema = z.object({
   name: text(80, "El nombre"),
   slug,
   isActive: checkbox,
-});
-
-const optionalEmail = z
-  .string()
-  .trim()
-  .max(254)
-  .refine((value) => value === "" || z.email().safeParse(value).success, "Correo no válido.")
-  .transform((value) => value || null);
-
-/** Una red por línea: "Instagram | https://www.instagram.com/usuario/". */
-const socialLinks = z
-  .string()
-  .max(2000)
-  .transform((value, context) => {
-    const rows = value
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [label, href] = line.split("|").map((part) => part.trim());
-        return { label: label ?? "", href: href ?? "" };
-      });
-    const valid = z
-      .array(
-        z.object({
-          label: z.string().min(1).max(40),
-          href: z.url({ protocol: /^https$/ }),
-        }),
-      )
-      .max(10)
-      .safeParse(rows);
-    if (!valid.success) {
-      context.addIssue({
-        code: "custom",
-        message: "Cada línea debe ser Nombre | https://… (solo enlaces https).",
-      });
-      return z.NEVER;
-    }
-    return valid.data;
-  });
-
-export const settingsSchema = z.object({
-  businessName: text(120, "El nombre comercial"),
-  slogan: optionalText(160),
-  description: optionalText(1000),
-  whatsappNumber: z
-    .string()
-    .trim()
-    .refine(
-      (value) => value === "" || /^[1-9][0-9]{7,14}$/.test(value),
-      "Solo dígitos con indicativo, sin + ni espacios (ej. 573001234567).",
-    )
-    .transform((value) => value || null),
-  contactEmail: optionalEmail,
-  phone: optionalText(30),
-  businessAddress: optionalText(200),
-  legalName: optionalText(160),
-  taxId: optionalText(30),
-  judicialAddress: optionalText(200),
-  salesAuthorization: optionalText(80),
-  socialLinks,
-  brandColor: z
-    .string()
-    .trim()
-    .regex(/^#[0-9a-fA-F]{6}$/, "Color en formato #RRGGBB."),
 });
 
 export const uploadPathSchema = z

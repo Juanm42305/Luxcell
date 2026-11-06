@@ -194,14 +194,7 @@ for (const p of [
   const a = await fetch(app + p, { redirect: "manual" });
   check(`${p} no existe (404, sin pistas del panel)`, a.status === 404, `HTTP ${a.status}`);
 }
-for (const p of [
-  "",
-  "/productos",
-  "/productos/nuevo",
-  "/configuracion",
-  "/mfa",
-  "/nueva-contrasena",
-]) {
+for (const p of ["", "/productos", "/productos/nuevo", "/mfa", "/nueva-contrasena"]) {
   const a = await fetch(app + ADMIN + p, { redirect: "manual" });
   check(
     `ruta secreta${p || " (resumen)"} sin sesión redirige al login`,

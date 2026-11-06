@@ -64,18 +64,6 @@ export async function listAdminBrands() {
   return data;
 }
 
-export async function getAdminSettings() {
-  const { supabase } = await requireAdmin();
-  const { data, error } = await supabase.from("business_settings").select("*").single();
-  if (error) fail("No se pudo cargar la configuración", error.code);
-  return {
-    settings: data,
-    logoUrl: data.logo_path
-      ? supabase.storage.from("business-assets").getPublicUrl(data.logo_path).data.publicUrl
-      : null,
-  };
-}
-
 export async function getRecentActivity() {
   const { supabase } = await requireAdmin();
   const [products, movements] = await Promise.all([
