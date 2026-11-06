@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_COLOR_LENGTH, MAX_COLORS } from "@/lib/product-labels";
+import { MAX_COLOR_LENGTH, MAX_COLORS, storageCapacities } from "@/lib/product-labels";
 import { SLUG_PATTERN } from "@/lib/slug";
 
 /*
@@ -122,7 +122,9 @@ const productFields = z.object({
   condition: z.enum(["new", "display", "like_new", "refurbished"], {
     message: "Elige el estado del producto.",
   }),
-  storageCapacity: optionalText(40),
+  storageCapacity: z
+    .enum(["", ...storageCapacities], { message: "Elige una capacidad de la lista." })
+    .transform((value) => value || null),
   colors,
   specs,
   warrantyTerms: optionalText(2000),

@@ -11,6 +11,11 @@ export const conditionOptions = (Object.keys(conditionLabels) as ProductConditio
   (value) => ({ value, label: conditionLabels[value] }),
 );
 
+/** Mismas opciones que permite la base de datos. */
+export const storageCapacities = ["64 GB", "128 GB", "256 GB", "512 GB", "1 TB"] as const;
+
+export const storageOptions = storageCapacities.map((value) => ({ value, label: value }));
+
 /** Sugerencias del panel; el negocio puede escribir cualquier otro color. */
 export const suggestedColors = [
   "Negro",

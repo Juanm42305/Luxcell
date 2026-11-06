@@ -111,6 +111,20 @@ describe("productSchema", () => {
     );
   });
 
+  it("solo acepta las capacidades de la lista", () => {
+    for (const storageCapacity of ["64 GB", "128 GB", "256 GB", "512 GB", "1 TB"]) {
+      expect(productSchema.parse({ ...validProduct, storageCapacity }).storageCapacity).toBe(
+        storageCapacity,
+      );
+    }
+    expect(
+      productSchema.parse({ ...validProduct, storageCapacity: "" }).storageCapacity,
+    ).toBeNull();
+    for (const storageCapacity of ["32 GB", "256gb", "1T", "<script>"]) {
+      expect(productSchema.safeParse({ ...validProduct, storageCapacity }).success).toBe(false);
+    }
+  });
+
   it("solo acepta los cuatro estados del producto", () => {
     for (const condition of ["new", "display", "like_new", "refurbished"]) {
       expect(productSchema.safeParse({ ...validProduct, condition }).success).toBe(true);

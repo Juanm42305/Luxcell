@@ -127,6 +127,12 @@ await page.fill("#specs", "Pantalla: 6,1 pulgadas\nBatería: prueba");
 await page.fill("#price", "2.500.000");
 await page.selectOption("#condition", "display");
 check(
+  "el almacenamiento ofrece solo 64 GB, 128 GB, 256 GB, 512 GB y 1 TB",
+  JSON.stringify(await page.locator("#storageCapacity option").allTextContents()) ===
+    JSON.stringify(["Sin almacenamiento", "64 GB", "128 GB", "256 GB", "512 GB", "1 TB"]),
+);
+await page.selectOption("#storageCapacity", "1 TB");
+check(
   "el estado ofrece solo Nuevo, Exhibición, Seminuevo y Reacondicionado",
   JSON.stringify(await page.locator("#condition option").allTextContents()) ===
     JSON.stringify(["Nuevo", "Exhibición", "Seminuevo", "Reacondicionado"]),
@@ -254,6 +260,7 @@ check(
 check("precio con formato colombiano", (await pub2.textContent("main")).includes("$2.500.000 COP"));
 const publicText = await pub2.textContent("main");
 check("la web muestra el estado Exhibición", publicText.includes("Exhibición"));
+check("la web muestra el almacenamiento elegido", publicText.includes("1 TB"));
 check("la web muestra los colores elegidos", publicText.includes("Negro, Azul pacífico"));
 check(
   "la web muestra la oferta con descuento y contador",

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/button";
-import { conditionOptions } from "@/lib/product-labels";
+import { conditionOptions, storageOptions } from "@/lib/product-labels";
 import { toSlug } from "@/lib/slug";
 import type { ActionState } from "../action-state";
 import { useFormAction } from "../use-form-action";
@@ -129,13 +129,14 @@ export function ProductForm({ action, brands, categories, initial }: ProductForm
           defaultValue={initial?.condition ?? "new"}
           error={errors.condition}
         />
-        <TextField
+        <SelectField
           name="storageCapacity"
           label="Almacenamiento (opcional)"
-          maxLength={40}
+          options={storageOptions}
+          placeholder="Sin almacenamiento"
           defaultValue={initial?.storage_capacity}
           error={errors.storageCapacity}
-          hint="Ej. 128 GB"
+          hint="Déjalo en «Sin almacenamiento» para accesorios."
         />
         <ColorPicker name="colors" defaultValue={initial?.colors} error={errors.colors} />
         <TextArea
