@@ -57,16 +57,6 @@ export async function SiteFooter() {
                 </Link>
               </li>
             ))}
-            <li>
-              <a
-                href="https://www.sic.gov.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={footerLinkClass}
-              >
-                Superintendencia de Industria y Comercio
-              </a>
-            </li>
           </ul>
         </nav>
 

@@ -114,35 +114,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "5. Proveedores que procesan datos por nuestra cuenta",
-            body: (
-              <>
-                <p>
-                  Para operar el sitio usamos proveedores tecnológicos que actúan como encargados:
-                </p>
-                <ul>
-                  <li>
-                    Supabase: base de datos y autenticación, con servidores en{" "}
-                    <Pending>país y región del proyecto de Supabase</Pending>.
-                  </li>
-                  <li>Vercel: alojamiento del sitio web.</li>
-                </ul>
-                <p>
-                  Estos servidores pueden estar fuera de Colombia, lo que constituye una transmisión
-                  internacional de datos.{" "}
-                  <Pending>
-                    contrato o acuerdo de transmisión con cada proveedor, validado jurídicamente
-                  </Pending>
-                </p>
-                <p>
-                  Cuando decides escribirnos por WhatsApp o Instagram, esos servicios pertenecen a
-                  Meta Platforms, que trata la información según sus propias políticas.
-                </p>
-              </>
-            ),
-          },
-          {
-            heading: "6. Tus derechos",
+            heading: "5. Tus derechos",
             body: (
               <>
                 <p>Como titular de los datos tienes derecho a:</p>
@@ -164,7 +136,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "7. Cómo ejercer tus derechos",
+            heading: "6. Cómo ejercer tus derechos",
             body: (
               <>
                 <p>Puedes enviar tu consulta o reclamo por cualquiera de estos canales:</p>
@@ -192,7 +164,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "8. Seguridad",
+            heading: "7. Seguridad",
             body: (
               <p>
                 Aplicamos medidas técnicas y administrativas razonables: cifrado en tránsito, acceso
@@ -203,7 +175,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "9. Conservación",
+            heading: "8. Conservación",
             body: (
               <p>
                 Conservamos tus datos solo el tiempo necesario para la finalidad para la que los
@@ -213,7 +185,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "10. Vigencia y cambios",
+            heading: "9. Vigencia y cambios",
             body: (
               <p>
                 Esta política rige desde el <Pending>fecha de entrada en vigor</Pending> (versión{" "}
@@ -319,8 +291,8 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
               <>
                 <p>
                   Antes de que pagues te informaremos por escrito el precio total, los medios de
-                  pago disponibles, el plazo de entrega y las condiciones de garantía y retracto. La
-                  compra se entiende acordada cuando confirmas expresamente el pedido.
+                  pago disponibles, el plazo de entrega y las condiciones de garantía. La compra se
+                  entiende acordada cuando confirmas expresamente el pedido.
                 </p>
                 <p>
                   Si no acordamos un plazo, entregaremos en máximo 30 días calendario. Si no podemos
@@ -332,19 +304,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "6. Derecho de retracto",
-            body: (
-              <p>
-                En las compras a distancia puedes retractarte dentro de los 5 días hábiles
-                siguientes a la entrega, devolviendo el producto en las mismas condiciones en que lo
-                recibiste. Los costos de devolución corren por tu cuenta. Te reintegraremos el
-                dinero en máximo 15 días calendario. Este derecho tiene las excepciones previstas en
-                el artículo 47 de la Ley 1480 de 2011.
-              </p>
-            ),
-          },
-          {
-            heading: "7. Garantía",
+            heading: "6. Garantía",
             body: (
               <p>
                 Todos los productos tienen la garantía legal. Su plazo se indica en cada producto. A
@@ -356,7 +316,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "8. Reversión del pago",
+            heading: "7. Reversión del pago",
             body: (
               <p>
                 Si pagas con tarjeta u otro medio electrónico, puedes solicitar la reversión del
@@ -366,7 +326,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "9. Peticiones, quejas y reclamos",
+            heading: "8. Peticiones, quejas y reclamos",
             body: (
               <>
                 <p>Puedes presentarlos por estos canales:</p>
@@ -375,7 +335,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "10. Menores de edad",
+            heading: "9. Menores de edad",
             body: (
               <p>
                 Si eres menor de edad, necesitas la autorización de tus padres o representantes para
@@ -384,7 +344,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "11. Propiedad intelectual",
+            heading: "10. Propiedad intelectual",
             body: (
               <p>
                 La marca, el logo y los contenidos propios de {s.name} están protegidos. Las marcas
@@ -395,7 +355,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "12. Responsabilidad",
+            heading: "11. Responsabilidad",
             body: (
               <p>
                 Respondemos por la calidad, idoneidad, seguridad y garantía de los productos que
@@ -405,7 +365,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
             ),
           },
           {
-            heading: "13. Ley aplicable y cambios",
+            heading: "12. Ley aplicable y cambios",
             body: (
               <p>
                 Estos términos se rigen por las leyes de Colombia. Si los modificamos, publicaremos
