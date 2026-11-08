@@ -13,6 +13,8 @@ const categoryLogos: Record<string, { src: string; width: number; height: number
   xiaomi: { src: "/brand/categorias/xiaomi.webp", width: 160, height: 160 },
   motorola: { src: "/brand/categorias/motorola.webp", width: 240, height: 133 },
   "otros-android": { src: "/brand/categorias/otros-android.webp", width: 135, height: 160 },
+  cargadores: { src: "/brand/categorias/cargadores.webp", width: 240, height: 148 },
+  audifonos: { src: "/brand/categorias/audifonos.webp", width: 160, height: 160 },
 };
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {

@@ -310,8 +310,7 @@ export function getLegalDocument(slug: string, s: BusinessSettings): LegalDocume
                 Todos los productos tienen la garantía legal. Su plazo se indica en cada producto. A
                 falta de indicación, es de un año para productos nuevos. Los productos usados tienen
                 garantía de tres meses, salvo que hayas aceptado por escrito comprarlos sin ella
-                cuando la ley lo permite. Condiciones del negocio:{" "}
-                <Pending>términos de garantía por tipo de producto</Pending>.
+                cuando la ley lo permite.
               </p>
             ),
           },
