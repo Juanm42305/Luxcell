@@ -53,7 +53,15 @@ export async function ProductCard({
           {product.brand.name} · {product.model}
         </p>
         <h3 className="mt-1 font-semibold tracking-tight text-balance">
-          <Link href={`/producto/${product.slug}`} className="hover:underline">
+          {/*
+           * El ::after estira este enlace sobre toda la tarjeta: un clic en cualquier parte
+           * abre el producto. Los botones de abajo van con z-10 para quedar encima y seguir
+           * funcionando por su cuenta.
+           */}
+          <Link
+            href={`/producto/${product.slug}`}
+            className="after:absolute after:inset-0 after:rounded-3xl group-hover:underline focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ink"
+          >
             {product.name}
           </Link>
         </h3>
@@ -86,11 +94,12 @@ export async function ProductCard({
             accessibleLabel={`${contact.label}: ${product.name}`}
             tone={isOut ? "quiet" : "solid"}
             size="sm"
+            className="relative z-10"
           />
           <Link
             href={`/producto/${product.slug}`}
             aria-label={`Ver detalles de ${product.name}`}
-            className="flex min-h-11 items-center justify-center rounded-full text-xs font-medium sm:text-sm transition-colors hover:bg-ink/5"
+            className="relative z-10 flex min-h-11 items-center justify-center rounded-full text-xs font-medium sm:text-sm transition-colors hover:bg-ink/5"
           >
             Ver detalles
           </Link>
