@@ -40,6 +40,18 @@
   --ease-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
   --animate-rise: rise 0.7s var(--ease-soft) both;
   --animate-float: float 7s ease-in-out infinite;
+  --animate-pop: pop 0.18s var(--ease-soft) both;
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   @keyframes rise {
     from {

@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Star, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/cn";
 import { deleteImage, moveImage, setPrimaryImage, updateImageAlt } from "../actions/images";
 import type { ActionState } from "../action-state";
@@ -17,6 +18,7 @@ export function ImageManager({ images }: { images: ManagedImage[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   function run(action: () => Promise<ActionState>) {
     startTransition(async () => {
@@ -127,11 +129,7 @@ export function ImageManager({ images }: { images: ManagedImage[] }) {
               <button
                 type="button"
                 disabled={isPending}
-                onClick={() => {
-                  if (window.confirm("¿Eliminar esta foto? No se puede deshacer.")) {
-                    run(() => deleteImage(image.id));
-                  }
-                }}
+                onClick={() => setPendingDelete(image.id)}
                 aria-label="Eliminar foto"
                 title="Eliminar foto"
                 className={cn(iconButton, "ml-auto text-warn hover:border-warn")}
@@ -142,6 +140,19 @@ export function ImageManager({ images }: { images: ManagedImage[] }) {
           </li>
         ))}
       </ul>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="¿Eliminar esta foto?"
+        description="Se borra del producto y de la web. No se puede deshacer."
+        confirmLabel="Sí, eliminar foto"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          const id = pendingDelete;
+          setPendingDelete(null);
+          if (id) run(() => deleteImage(id));
+        }}
+      />
     </div>
   );
 }
