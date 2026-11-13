@@ -67,14 +67,18 @@ export async function ProductCard({
               : `Disponible en ${product.colors.length} colores`}
           </p>
         )}
-        <ProductPrice
-          priceCop={product.priceCop}
-          salePriceCop={product.salePriceCop}
-          offerValidUntil={product.offerValidUntil}
-          className="mt-3 pb-3 sm:pb-4"
-        />
 
-        <div className="mt-auto flex flex-col gap-2">
+        {/*
+         * El precio va pegado a los botones, abajo de la tarjeta: como todas las tarjetas de
+         * una fila miden lo mismo, queda a la misma altura sin importar cuánto texto haya arriba.
+         */}
+        <div className="mt-auto flex flex-col gap-2 pt-3">
+          <ProductPrice
+            priceCop={product.priceCop}
+            salePriceCop={product.salePriceCop}
+            offerValidUntil={product.offerValidUntil}
+            className="pb-1 sm:pb-2"
+          />
           <WhatsAppLink
             phoneNumber={whatsappNumber}
             message={contact.message}

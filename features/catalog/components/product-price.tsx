@@ -88,8 +88,18 @@ export function ProductPrice({
   }
 
   return (
-    <div className={className}>
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+    /*
+     * En la tarjeta el precio rebajado va siempre en la última línea (el contador y, si no
+     * cabe al lado, el precio tachado suben), para que quede a la misma altura que el precio
+     * de las tarjetas sin oferta. Solo cambia el orden visual; el lector de pantalla lee igual.
+     */
+    <div className={cn(!isPage && "flex flex-col-reverse items-start gap-1.5", className)}>
+      <div
+        className={cn(
+          "flex items-baseline gap-x-2 gap-y-0.5",
+          isPage ? "flex-wrap" : "flex-wrap-reverse",
+        )}
+      >
         <p className={priceClass}>
           <span className="sr-only">Precio en oferta: </span>
           {formatCop(salePriceCop)}
@@ -103,8 +113,8 @@ export function ProductPrice({
       {endsAt !== null && (
         <p
           className={cn(
-            "mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-ink font-medium whitespace-nowrap text-white",
-            isPage ? "px-3 py-1.5 text-sm" : "px-2 py-1 text-[11px] sm:text-xs",
+            "inline-flex items-center gap-1.5 rounded-full bg-ink font-medium whitespace-nowrap text-white",
+            isPage ? "mt-1.5 px-3 py-1.5 text-sm" : "px-2 py-1 text-[11px] sm:text-xs",
           )}
         >
           <Clock aria-hidden className={isPage ? "size-4" : "size-3"} />
