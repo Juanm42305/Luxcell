@@ -37,7 +37,6 @@ from (values
   ('Galaxy de ejemplo A', 'ejemplo-galaxy-a', 'DEMO-003', 'samsung', 'samsung', 3800000, 8, 'new', '256 GB', array['Negro de ejemplo', 'Gris de ejemplo'], null, true),
   ('Galaxy de ejemplo B', 'ejemplo-galaxy-b', 'DEMO-004', 'samsung', 'samsung', 1200000, 0, 'display', '128 GB', array['Verde de ejemplo'], null, false),
   ('Xiaomi de ejemplo A', 'ejemplo-xiaomi-a', 'DEMO-005', 'xiaomi', 'xiaomi', 1650000, 15, 'new', '256 GB', array['Lila de ejemplo'], 1490000, true),
-  ('Motorola de ejemplo A', 'ejemplo-motorola-a', 'DEMO-006', 'motorola', 'motorola', 980000, 3, 'like_new', '128 GB', array['Coral de ejemplo'], null, false),
   ('Audífonos de ejemplo A', 'ejemplo-audifonos-a', 'DEMO-007', 'generica', 'audifonos', 320000, 20, 'new', null, array['Blanco de ejemplo'], null, true),
   ('Cargador de ejemplo A', 'ejemplo-cargador-a', 'DEMO-008', 'generica', 'cargadores', 95000, 30, 'new', null, array['Blanco de ejemplo'], null, false),
   ('Funda de ejemplo A', 'ejemplo-funda-a', 'DEMO-009', 'generica', 'protectores-fundas', 60000, 1, 'new', null, array['Arena de ejemplo'], null, false),

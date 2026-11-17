@@ -11,9 +11,8 @@ const categoryLogos: Record<string, { src: string; width: number; height: number
   iphone: { src: "/brand/categorias/iphone.webp", width: 131, height: 160 },
   samsung: { src: "/brand/categorias/samsung.webp", width: 240, height: 41 },
   xiaomi: { src: "/brand/categorias/xiaomi.webp", width: 160, height: 160 },
-  motorola: { src: "/brand/categorias/motorola.webp", width: 240, height: 133 },
   "otros-android": { src: "/brand/categorias/otros-android.webp", width: 135, height: 160 },
-  cargadores: { src: "/brand/categorias/cargadores.webp", width: 240, height: 148 },
+  cargadores: { src: "/brand/categorias/cargadores.webp", width: 230, height: 240 },
   audifonos: { src: "/brand/categorias/audifonos.webp", width: 160, height: 160 },
 };
 
